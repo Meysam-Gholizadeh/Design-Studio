@@ -1,0 +1,40 @@
+.note {
+  font-size: 12px;
+  color: var(--app-text-2);
+  line-height: 1.45;
+}
+
+.layouts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--radius-md);
+  background: var(--app-surface);
+  color: var(--app-text);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.layout:hover {
+  border-color: var(--app-accent);
+}
+
+.layout:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.layoutName {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 2px 2px;
+}

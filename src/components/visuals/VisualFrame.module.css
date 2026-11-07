@@ -1,0 +1,87 @@
+.frame {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: calc(14px * var(--ds-space, 1));
+  overflow: hidden;
+  color: var(--ds-text);
+  font-family: var(--ds-font);
+}
+
+.header {
+  flex: 0 0 auto;
+  margin-bottom: 8px;
+  min-width: 0;
+}
+
+.header[data-align='center'] {
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.3;
+  font-weight: var(--ds-heading-weight, 600);
+  color: var(--ds-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.title[data-size='sm'] {
+  font-size: 12px;
+}
+
+.title[data-size='lg'] {
+  font-size: 16px;
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  line-height: 1.3;
+  color: var(--ds-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Subtitle as an overline above the title. */
+.header[data-subtitle='above'] {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.header[data-subtitle='above'] .subtitle {
+  margin: 0 0 3px;
+}
+
+/* Decorative photo on the right, fading into the card behind the content. */
+.backdrop {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 62%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  pointer-events: none;
+  user-select: none;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 42%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 42%);
+}
+
+.header {
+  position: relative;
+}
+
+.body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}

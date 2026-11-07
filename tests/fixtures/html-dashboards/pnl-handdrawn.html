@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Profit &amp; Loss Overview</title>
+  <!--
+    Test fixture modelled on a dashboard reported by a user: a slim filter bar
+    with unlabelled dropdowns next to each other, six KPI cards in one row, and
+    hand-drawn SVG charts styled with CSS classes / variables and an HTML legend
+    inside <foreignObject>.
+  -->
+  <style>
+    :root { --accent: #2563eb; --accent-2: #f59e0b; --ink: #0f172a; --muted: #64748b; }
+    body { margin: 0; font-family: Inter, Arial, sans-serif; background: #f5f7fb; color: var(--ink); }
+    .page { padding: 24px 32px; }
+    h1 { font-size: 26px; margin: 0 0 16px; }
+    .filters { display: flex; gap: 12px; align-items: center; background: #fff; border-radius: 10px; padding: 10px 14px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+    .filters .lbl { font-size: 12px; color: var(--muted); text-transform: uppercase; }
+    select { padding: 6px 10px; border: 1px solid #d0d5dd; border-radius: 6px; }
+    .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-bottom: 18px; }
+    .card { background: #fff; border-radius: 10px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+    .k-label { font-size: 12px; color: var(--muted); }
+    .k-value { font-size: 26px; font-weight: 700; margin: 4px 0; }
+    .k-delta { font-size: 12px; color: #16a34a; }
+    .k-delta.neg { color: #dc2626; }
+    .charts { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 18px; }
+    .card h2 { font-size: 15px; margin: 0 0 8px; }
+    svg .bar { fill: var(--accent); }
+    svg .bar.alt { fill: var(--accent-2); }
+    svg .line { fill: none; stroke: var(--accent-2); stroke-width: 3; }
+    svg .axis { stroke: #cbd5e1; }
+    svg text { fill: var(--muted); font-size: 11px; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Profit &amp; Loss Overview</h1>
+    <div class="filters">
+      <span class="lbl">Filter by</span>
+      <select><option>Full year 2025</option><option>H1 2025</option><option>Q4 2025</option></select>
+      <select><option>All departments</option><option>Sales</option><option>Operations</option></select>
+      <select><option>Actual</option><option>Budget</option></select>
+    </div>
+    <div class="kpis">
+      <div class="card"><div class="k-label">Total Revenue</div><div class="k-value">$12.48M</div><div class="k-delta">▲ 8.4% vs prior period</div></div>
+      <div class="card"><div class="k-label">Gross Profit</div><div class="k-value">$7.61M</div><div class="k-delta">▲ 6.2% vs prior period</div></div>
+      <div class="card"><div class="k-label">Operating Expenses</div><div class="k-value">$5.12M</div><div class="k-delta neg">▲ 3.1% vs prior period</div></div>
+      <div class="card"><div class="k-label">EBITDA</div><div class="k-value">$2.49M</div><div class="k-delta">▲ 11.7% vs prior period</div></div>
+      <div class="card"><div class="k-label">Net profit</div><div class="k-value">$1.72M</div><div class="k-delta">▲ 9.6% vs prior period</div></div>
+      <div class="card"><div class="k-label">Net Profit Margin</div><div class="k-value">13.8%</div></div>
+    </div>
+    <div class="charts">
+      <div class="card">
+        <h2>Revenue &amp; Profit Trend</h2>
+        <svg width="100%" height="260" viewBox="0 0 700 260">
+          <line class="axis" x1="30" y1="230" x2="690" y2="230"></line>
+          <rect class="bar" x="50" y="90" width="60" height="140"></rect>
+          <rect class="bar" x="210" y="70" width="60" height="160"></rect>
+          <rect class="bar" x="370" y="60" width="60" height="170"></rect>
+          <rect class="bar" x="530" y="40" width="60" height="190"></rect>
+          <polyline class="line" points="80,160 240,150 400,130 560,110"></polyline>
+          <text x="70" y="248">Q1</text><text x="230" y="248">Q2</text><text x="390" y="248">Q3</text><text x="550" y="248">Q4</text>
+          <foreignObject x="500" y="0" width="190" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="font-size:11px">■ Revenue ■ Profit</div></foreignObject>
+        </svg>
+      </div>
+      <div class="card">
+        <h2>Actual vs Budget</h2>
+        <svg width="100%" height="260" viewBox="0 0 340 260">
+          <rect class="bar" x="40" y="60" width="50" height="170"></rect>
+          <rect class="bar alt" x="100" y="80" width="50" height="150"></rect>
+          <rect class="bar" x="190" y="100" width="50" height="130"></rect>
+          <rect class="bar alt" x="250" y="90" width="50" height="140"></rect>
+        </svg>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

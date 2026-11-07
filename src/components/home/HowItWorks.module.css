@@ -1,0 +1,115 @@
+.steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Connecting line behind the badges, drawn when revealed. */
+.steps::before {
+  content: '';
+  position: absolute;
+  top: 26px;
+  left: calc(16.66% + 26px);
+  right: calc(16.66% + 26px);
+  height: 2px;
+  background: linear-gradient(90deg, #60a5fa, #a78bfa, #f472b6);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 1100ms 200ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  opacity: 0.6;
+}
+
+.steps[data-revealed]::before {
+  transform: scaleX(1);
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 600ms ease,
+    transform 600ms ease;
+  transition-delay: calc(var(--i) * 160ms);
+}
+
+.steps[data-revealed] .step {
+  opacity: 1;
+  transform: none;
+}
+
+.badge {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  color: #fff;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  box-shadow:
+    0 0 0 6px rgba(255, 255, 255, 0.05),
+    0 14px 30px -10px rgba(139, 92, 246, 0.9);
+}
+
+.number {
+  position: absolute;
+  right: -7px;
+  top: -7px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #0e1a4f;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.title {
+  margin: 16px 0 6px;
+  font-size: 16px;
+  font-weight: 650;
+  color: #fff;
+}
+
+.text {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(226, 232, 255, 0.74);
+}
+
+@media (max-width: 800px) {
+  .steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .steps::before {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .steps::before {
+    transition: none;
+    transform: scaleX(1);
+  }
+
+  .step {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}

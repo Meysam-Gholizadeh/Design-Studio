@@ -1,0 +1,17 @@
+.page {
+  position: relative;
+  overflow: hidden;
+  background: var(--ds-page-bg);
+  font-family: var(--ds-font);
+  color: var(--ds-text);
+  box-sizing: border-box;
+  /* Dashboard text must not inherit app chrome sizing. */
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.item {
+  position: absolute;
+  box-sizing: border-box;
+}

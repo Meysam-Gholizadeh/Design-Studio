@@ -1,0 +1,307 @@
+.arcWrap {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.arc {
+  width: 100%;
+  flex: 1 1 0;
+  min-height: 0;
+  display: block;
+  font-family: var(--ds-font);
+}
+
+.svgValue {
+  font-size: 17px;
+  font-weight: var(--ds-heading-weight, 600);
+  fill: var(--ds-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.svgCaption {
+  font-size: 7px;
+  fill: var(--ds-muted);
+}
+
+.value {
+  font-size: clamp(16px, min(16cqh, 13cqw), 40px);
+  font-weight: var(--ds-heading-weight, 600);
+  color: var(--ds-text);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.caption {
+  font-size: 11.5px;
+  color: var(--ds-muted);
+  margin-top: 2px;
+}
+
+.arcTarget {
+  font-size: 11px;
+  color: var(--ds-muted);
+  margin-top: 4px;
+}
+
+.progress {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.progressHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.progress .value {
+  font-size: 24px;
+}
+
+.track {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--ds-surface-alt);
+  box-shadow: inset 0 0 0 1px var(--ds-border);
+}
+
+.fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ds-primary);
+}
+
+.targetMark {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--ds-text);
+  border-radius: 1px;
+}
+
+.scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ds-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.scale span[data-current] {
+  color: var(--ds-text);
+  font-weight: 600;
+}
+
+.caption[data-tone='accent'] {
+  color: var(--ds-primary);
+  font-weight: 600;
+}
+
+.symbol {
+  font-size: 0.42em;
+  font-weight: 500;
+  color: var(--ds-muted);
+  vertical-align: 0.95em;
+  margin-right: 0.08em;
+}
+
+/* Hatched progress bar with a handle at the current position. */
+.progress[data-track='striped'] {
+  container-type: size;
+  gap: 10px;
+}
+
+.progress[data-track='striped'] .value {
+  font-size: clamp(28px, min(34cqh, 13cqw), 64px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.progress[data-track='striped'] .track {
+  height: 16px;
+  box-shadow: none;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--ds-surface-alt) 0 3px,
+    color-mix(in srgb, var(--ds-text) 14%, var(--ds-surface-alt)) 3px 4.5px
+  );
+}
+
+.progress[data-track='striped'] .fill {
+  box-shadow: 0 0 16px -4px color-mix(in srgb, var(--ds-primary) 70%, transparent);
+}
+
+.handle {
+  position: absolute;
+  top: 50%;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  color: var(--ds-text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* Concentric activity rings with stat columns underneath. */
+.ringsWrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.ringsArt {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.ringsArt svg {
+  height: 100%;
+  aspect-ratio: 1;
+  max-width: 100%;
+  display: block;
+}
+
+.ringsIcon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--ds-primary);
+}
+
+.ringsStats {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  margin: 0;
+}
+
+.ringsStat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 10px;
+  min-width: 0;
+}
+
+.ringsStat:first-child {
+  padding-left: 0;
+}
+
+.ringsStat + .ringsStat {
+  border-left: 1px solid var(--ds-border);
+}
+
+.ringsStatIcon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  color: var(--ds-primary);
+  background: color-mix(in srgb, var(--ds-primary) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ds-primary) 35%, transparent);
+}
+
+.ringsStat dt {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+.ringsStat dd {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.ringsValue {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ds-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.ringsMax,
+.ringsUnit {
+  font-size: 11px;
+  color: var(--ds-muted);
+}
+
+/* Ring gauge. */
+.ringWrap {
+  container-type: size;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7%;
+}
+
+.ring {
+  position: relative;
+  height: min(100%, 100cqh);
+  aspect-ratio: 1;
+  max-width: 60%;
+}
+
+.ring svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.ringArc {
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--ds-primary) 45%, transparent));
+}
+
+.ringCenter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.ringValue {
+  font-size: clamp(16px, 15cqh, 44px);
+  font-weight: var(--ds-heading-weight, 600);
+  color: var(--ds-text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.ringSide {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ringSide .value {
+  font-size: clamp(18px, 17cqh, 48px);
+}

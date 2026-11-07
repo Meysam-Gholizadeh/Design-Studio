@@ -1,0 +1,15 @@
+.outer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.outer[data-fit='contain'] {
+  height: 100%;
+}
+
+.inner {
+  position: absolute;
+  top: 0;
+  transform-origin: 0 0;
+}

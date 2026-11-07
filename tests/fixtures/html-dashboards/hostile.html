@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hostile page</title>
+  <!-- Test fixture: tries to break out of the import sandbox. Every attempt must fail. -->
+  <script>
+    window.__attempts = [];
+    const attempt = (name, fn) => { try { fn(); window.__attempts.push(name + ': succeeded'); } catch (e) { window.__attempts.push(name + ': blocked'); } };
+    attempt('read parent DOM', () => { parent.document.title = 'HACKED'; });
+    attempt('read storage', () => { localStorage.setItem('x', '1'); });
+    attempt('read cookies', () => { document.cookie = 'a=1'; if (!document.cookie) throw new Error('no cookies'); });
+    attempt('navigate top', () => { top.location.href = 'https://example.com/'; });
+    attempt('open popup', () => { if (!window.open('https://example.com/')) throw new Error('blocked'); });
+    // A forged extraction result without the right nonce must be ignored.
+    parent.postMessage({ type: 'bi-design-studio:html-extraction', nonce: 'guess', payload: { version: 1 } }, '*');
+  </script>
+</head>
+<body>
+  <h1>Hostile page</h1>
+  <table>
+    <tr><th>Item</th><th>Value</th></tr>
+    <tr><td>A</td><td>10</td></tr>
+    <tr><td>B</td><td>20</td></tr>
+  </table>
+</body>
+</html>

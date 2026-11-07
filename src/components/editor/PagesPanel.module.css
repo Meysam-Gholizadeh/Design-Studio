@@ -1,0 +1,96 @@
+.panel {
+  padding: 12px;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.row {
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+}
+
+.row[data-active] {
+  background: var(--app-accent-soft);
+  border-color: rgba(35, 70, 216, 0.25);
+}
+
+.pageButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 34px;
+  padding: 0 8px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--app-text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.row[data-active] .pageButton {
+  color: var(--app-accent-text);
+  font-weight: 600;
+}
+
+.pageButton:hover {
+  background: var(--app-surface-2);
+}
+
+.row[data-active] .pageButton:hover {
+  background: transparent;
+}
+
+.pageButton:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.count {
+  font-size: 11px;
+  color: var(--app-text-3);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 999px;
+  padding: 0 7px;
+}
+
+.actions {
+  display: flex;
+  gap: 2px;
+  padding: 0 4px 4px 26px;
+}
+
+.renameInput {
+  width: calc(100% - 8px);
+  margin: 4px;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--app-accent);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--focus-ring);
+  font-size: 13px;
+  outline: none;
+}
+
+.add {
+  margin-top: 12px;
+  width: 100%;
+}

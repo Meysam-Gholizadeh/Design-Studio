@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Library stubs</title>
+  <!--
+    Test fixture: minimal stand-ins for the runtime objects Plotly, Highcharts
+    and ApexCharts leave on a page (data on the plot element, the
+    Highcharts.charts registry, Apex._chartInstances). They exercise the
+    collector's reading code without loading the real libraries.
+  -->
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; padding: 24px; }
+    .card { border: 1px solid #ccc; border-radius: 8px; padding: 12px; }
+    .plot { height: 240px; background: #fafafa; }
+  </style>
+</head>
+<body>
+  <div class="grid">
+    <div class="card"><h3>Plotly Revenue</h3><div id="plotly" class="plot js-plotly-plot"></div></div>
+    <div class="card"><h3>Highcharts Share</h3><div id="hc" class="plot"></div></div>
+    <div class="card"><h3>Apex Visits</h3><div id="apex" class="plot"></div></div>
+  </div>
+  <script>
+    const plot = document.getElementById('plotly');
+    plot.data = [
+      { type: 'bar', name: '2025', x: ['Q1', 'Q2', 'Q3'], y: [0.12, 0.18, 0.15] },
+      { type: 'bar', name: '2026', x: ['Q1', 'Q2', 'Q3'], y: [0.14, 0.2, 0.19] }
+    ];
+    plot.layout = { barmode: 'group', yaxis: { tickformat: '.0%' } };
+
+    const hcEl = document.getElementById('hc');
+    const pieSeries = { type: 'pie', name: 'Share', options: { innerSize: '50%' }, points: [
+      { name: 'Alpha', y: 60, color: '#ff0000' }, { name: 'Beta', y: 40, color: '#00ff00' }
+    ] };
+    window.Highcharts = { charts: [undefined, { renderTo: hcEl, options: { chart: { type: 'pie' }, title: { text: 'Market Share' } }, series: [pieSeries], xAxis: [], yAxis: [], inverted: false }] };
+
+    const apexEl = document.getElementById('apex');
+    window.Apex = { _chartInstances: [{ id: 'visits', chart: { el: apexEl, w: { config: {
+      chart: { type: 'area', stacked: false },
+      series: [{ name: 'Visits', data: [120, 180, 150, 210] }],
+      xaxis: { categories: ['W1', 'W2', 'W3', 'W4'] },
+      colors: ['#0099ff'],
+      stroke: { curve: 'smooth' }
+    } } } }] };
+  </script>
+</body>
+</html>

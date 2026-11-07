@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Performance Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f4f6fb; color: #1e293b; display: flex; }
+    aside { width: 220px; min-height: 100vh; background: #1e293b; color: #cbd5e1; padding: 24px 16px; }
+    aside .brand { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 24px; }
+    aside nav a { display: block; color: #cbd5e1; text-decoration: none; padding: 8px 0; font-size: 14px; }
+    main { flex: 1; padding: 28px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    h1 { font-size: 26px; font-weight: 700; }
+    .filters { display: flex; gap: 12px; align-items: center; }
+    .seg button { border: 1px solid #cbd5e1; background: #fff; padding: 6px 12px; font-size: 13px; }
+    .seg button.active { background: #2563eb; color: #fff; }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+    .card { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08); }
+    .kpi-label { font-size: 13px; color: #64748b; }
+    .kpi-value { font-size: 30px; font-weight: 700; margin: 6px 0; }
+    .up { color: #16a34a; font-size: 13px; }
+    .down { color: #dc2626; font-size: 13px; }
+    .row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .row.even { grid-template-columns: 1fr 1fr; }
+    .card h3 { font-size: 15px; margin-bottom: 4px; }
+    .card p.sub { font-size: 12px; color: #64748b; margin-bottom: 10px; }
+    .chart-box { position: relative; height: 260px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 8px; border-bottom: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+  <aside>
+    <div class="brand">Acme Analytics</div>
+    <nav><a href="#">Overview</a><a href="#">Customers</a><a href="#">Products</a></nav>
+  </aside>
+  <main>
+    <header>
+      <h1>Sales Performance Dashboard</h1>
+      <div class="filters">
+        <label for="region">Region</label>
+        <select id="region"><option>All regions</option><option>North</option><option>South</option><option>West</option></select>
+        <div class="seg" aria-label="Period"><button class="active">Monthly</button><button>Quarterly</button><button>Yearly</button></div>
+      </div>
+    </header>
+
+    <section class="kpis">
+      <div class="card"><div class="kpi-label">Total Revenue</div><div class="kpi-value">$2.45M</div><div class="up">▲ 12.5% vs last month</div></div>
+      <div class="card"><div class="kpi-label">Orders</div><div class="kpi-value">18,420</div><div class="up">▲ 4.1% vs last month</div></div>
+      <div class="card"><div class="kpi-label">Avg. Order Value</div><div class="kpi-value">$133.0</div><div class="down">▼ 2.3% vs last month</div></div>
+      <div class="card"><div class="kpi-label">Conversion Rate</div><div class="kpi-value">3.8%</div><div class="kpi-label">Target: 4.0%</div></div>
+    </section>
+
+    <section class="row">
+      <div class="card"><h3>Monthly Revenue</h3><p class="sub">Actual vs target, USD</p><div class="chart-box"><canvas id="revenue"></canvas></div></div>
+      <div class="card"><h3>Sales by Channel</h3><div class="chart-box"><canvas id="channel"></canvas></div></div>
+    </section>
+
+    <section class="row even">
+      <div class="card"><h3>Top Regions</h3><div class="chart-box"><canvas id="regions"></canvas></div></div>
+      <div class="card"><h3>Orders and Margin</h3><div class="chart-box"><canvas id="combo"></canvas></div></div>
+    </section>
+
+    <section class="card">
+      <h3>Top Products</h3>
+      <table>
+        <thead><tr><th>Product</th><th>Units</th><th>Revenue</th><th>Growth</th></tr></thead>
+        <tbody>
+          <tr><td>Alpha Pro</td><td>1,840</td><td>$412,000</td><td>12.4%</td></tr>
+          <tr><td>Beta Lite</td><td>1,320</td><td>$356,500</td><td>6.1%</td></tr>
+          <tr><td>Gamma Max</td><td>2,210</td><td>$221,000</td><td>-3.2%</td></tr>
+          <tr><td>Delta One</td><td>640</td><td>$198,400</td><td>18.9%</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <script>
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    new Chart(document.getElementById('revenue'), {
+      type: 'line',
+      data: { labels: months, datasets: [
+        { label: 'Revenue', data: [182, 190, 188, 201, 214, 209, 226, 231, 228, 240, 252, 260].map(v => v * 1000), borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.15)', fill: true, tension: 0.35 },
+        { label: 'Target', data: [180, 185, 190, 195, 200, 205, 210, 215, 220, 225, 230, 235].map(v => v * 1000), borderColor: '#94a3b8', borderDash: [4, 4], tension: 0.35 }
+      ] },
+      options: { maintainAspectRatio: false, scales: { y: { ticks: { callback: v => '$' + (v / 1000) + 'K' } } } }
+    });
+    new Chart(document.getElementById('channel'), {
+      type: 'doughnut',
+      data: { labels: ['Online', 'Retail', 'Partners'], datasets: [{ data: [54, 31, 15], backgroundColor: ['#2563eb', '#f59e0b', '#10b981'] }] },
+      options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+    new Chart(document.getElementById('regions'), {
+      type: 'bar',
+      data: { labels: ['North', 'South', 'East', 'West', 'Central'], datasets: [{ label: 'Revenue', data: [520000, 410000, 380000, 290000, 240000], backgroundColor: '#6366f1' }] },
+      options: { indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+    new Chart(document.getElementById('combo'), {
+      data: { labels: ['Q1', 'Q2', 'Q3', 'Q4'], datasets: [
+        { type: 'bar', label: 'Orders', data: [4200, 4600, 4400, 5200], backgroundColor: '#0ea5e9', yAxisID: 'y' },
+        { type: 'line', label: 'Margin %', data: [38.2, 39.1, 40.4, 41.0], borderColor: '#f43f5e', yAxisID: 'y1' }
+      ] },
+      options: { maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right', ticks: { callback: v => v + '%' }, grid: { drawOnChartArea: false } } } }
+    });
+  </script>
+</body>
+</html>

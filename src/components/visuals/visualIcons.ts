@@ -1,0 +1,35 @@
+import {
+  ChartArea,
+  ChartBarBig,
+  ChartColumn,
+  ChartColumnStacked,
+  ChartLine,
+  ChartPie,
+  Donut,
+  Gauge,
+  Hash,
+  ImageIcon,
+  ListFilter,
+  Minus,
+  Table2,
+  Type,
+  type LucideIcon,
+} from 'lucide-react';
+import type { VisualType } from '@/domain/schemas/visuals';
+
+export const VISUAL_ICONS: Record<VisualType, LucideIcon> = {
+  kpi: Hash,
+  bar: ChartColumn,
+  line: ChartLine,
+  area: ChartArea,
+  pie: ChartPie,
+  donut: Donut,
+  stackedBar: ChartColumnStacked,
+  combo: ChartBarBig,
+  table: Table2,
+  gauge: Gauge,
+  slicer: ListFilter,
+  text: Type,
+  image: ImageIcon,
+  divider: Minus,
+};

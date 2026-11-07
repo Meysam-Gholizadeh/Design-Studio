@@ -1,0 +1,89 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+  gap: var(--space-3);
+}
+
+.grid[data-compact] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.grid[data-compact] .card {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--radius-lg);
+  background: var(--app-surface);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.grid[data-compact] .card {
+  padding: 8px;
+  gap: 6px;
+  border-radius: var(--radius-md);
+}
+
+.card:hover {
+  border-color: var(--app-border-strong);
+}
+
+.card[data-checked] {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 1px var(--app-accent);
+}
+
+.card:focus-within {
+  box-shadow: var(--focus-ring);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 650;
+}
+
+.grid[data-compact] .name {
+  font-size: 12.5px;
+}
+
+.check {
+  color: var(--app-accent);
+}
+
+.description {
+  font-size: 12.5px;
+  color: var(--app-text-2);
+  line-height: 1.45;
+}
+
+.sample {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.sample strong {
+  font-size: 18px;
+}

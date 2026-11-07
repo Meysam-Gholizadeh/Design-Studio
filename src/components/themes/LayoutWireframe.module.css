@@ -1,0 +1,89 @@
+.wire {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.page {
+  fill: var(--app-surface-2);
+}
+
+.slot {
+  fill: var(--app-surface);
+  stroke: var(--app-border-strong);
+  stroke-width: 0.8;
+}
+
+.mark {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.75;
+}
+
+.markFill {
+  fill: currentColor;
+  opacity: 0.75;
+}
+
+.label {
+  font-size: 7px;
+  font-weight: 600;
+  fill: var(--app-text-3);
+}
+
+.title {
+  color: var(--app-text-2);
+}
+
+.title .slot {
+  fill: transparent;
+  stroke-dasharray: 2 2;
+}
+
+.kpi {
+  color: #2346d8;
+}
+
+.kpi .slot {
+  fill: #eef1fd;
+  stroke: #c6d0fa;
+}
+
+.chart {
+  color: #0e7c86;
+}
+
+.chart .slot {
+  fill: #e8f6f7;
+  stroke: #b7e1e4;
+}
+
+.table {
+  color: #7a5af8;
+}
+
+.table .slot {
+  fill: #f2efff;
+  stroke: #d6ccfd;
+}
+
+.filter {
+  color: #b54708;
+}
+
+.filter .slot {
+  fill: #fff4e6;
+  stroke: #fbd9ad;
+}
+
+.text {
+  color: var(--app-text-3);
+}
+
+.text .slot {
+  fill: var(--app-surface);
+  stroke-dasharray: 2 2;
+}

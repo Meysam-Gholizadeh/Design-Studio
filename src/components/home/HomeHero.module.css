@@ -1,0 +1,237 @@
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: 48px;
+  padding: 40px 20px 20px;
+  color: #fff;
+}
+.copy {
+  min-width: 0;
+  animation: rise 700ms ease-out both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 22px;
+  padding: 6px 14px 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+}
+
+.pulse {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+}
+
+.pulse::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #4ade80;
+  animation: ping 2s ease-out infinite;
+}
+
+@keyframes ping {
+  from {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(40px, 4.6vw, 64px);
+  line-height: 1.02;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  background: linear-gradient(100deg, #ffffff 0%, #dbe5ff 45%, #a5b8ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.tagline {
+  max-width: 30ch;
+  margin: 18px 0 30px;
+  font-size: clamp(17px, 1.5vw, 20px);
+  line-height: 1.5;
+  color: rgba(226, 232, 255, 0.86);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 22px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.primary {
+  background: #fff;
+  color: #1f2a6b;
+  box-shadow: 0 12px 28px -10px rgba(120, 150, 255, 0.8);
+}
+
+.primary:hover,
+.secondary:hover {
+  text-decoration: none;
+}
+
+.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px -12px rgba(120, 150, 255, 0.95);
+}
+
+.primary svg {
+  transition: transform 180ms ease;
+}
+
+.primary:hover svg {
+  transform: translateX(3px);
+}
+
+.secondary {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-2px);
+}
+
+.primary:focus-visible,
+.secondary:focus-visible,
+.aiLink:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.aiLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 18px;
+  color: #c7d2fe;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.aiLink:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.aiLink svg {
+  color: #c4b5fd;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  justify-content: start;
+  gap: 28px;
+  margin: 36px 0 0;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.stats div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+}
+
+.stats dt {
+  font-size: 12px;
+  color: rgba(226, 232, 255, 0.6);
+}
+
+.stats dd {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.visual {
+  min-width: 0;
+  animation: rise 900ms 150ms ease-out both;
+}
+
+@media (max-width: 1180px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+    padding: 32px 8px 8px;
+  }
+
+  .visual {
+    max-width: 720px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 20px 0 8px;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, auto);
+    gap: 18px 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse::after,
+  .copy,
+  .visual {
+    animation: none;
+  }
+}

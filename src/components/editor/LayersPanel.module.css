@@ -1,0 +1,72 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: var(--radius-md);
+  padding-right: 2px;
+}
+
+.row[data-selected] {
+  background: var(--app-accent-soft);
+}
+
+.row[data-hidden] .name {
+  color: var(--app-text-3);
+  text-decoration: line-through;
+}
+
+.select {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 8px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--app-text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.select:hover {
+  background: var(--app-surface-2);
+}
+
+.row[data-selected] .select {
+  color: var(--app-accent-text);
+  font-weight: 600;
+}
+
+.row[data-selected] .select:hover {
+  background: transparent;
+}
+
+.select:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.empty {
+  padding: 16px;
+  font-size: 13px;
+  color: var(--app-text-3);
+}

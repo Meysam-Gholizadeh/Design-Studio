@@ -1,0 +1,72 @@
+.previewHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: var(--space-8) 0 var(--space-3);
+}
+
+.previewTitle {
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.previewActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.layoutGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: var(--space-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.layoutCard {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--app-border);
+  border-radius: var(--radius-lg);
+  background: var(--app-surface);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+}
+
+.wire {
+  padding: 14px;
+  background: var(--app-surface-2);
+  border-bottom: 1px solid var(--app-border);
+}
+
+.layoutMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 14px 16px 16px;
+  flex: 1;
+}
+
+.layoutName {
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.layoutDescription {
+  font-size: 13px;
+  color: var(--app-text-2);
+  line-height: 1.5;
+}
+
+.bestFor {
+  font-size: 12.5px;
+  color: var(--app-text-3);
+  margin-bottom: 6px;
+  flex: 1;
+}

@@ -1,0 +1,32 @@
+.center {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: var(--app-text-2);
+}
+
+.center > * {
+  max-width: 560px;
+}
+
+.spinner {
+  color: var(--app-accent);
+  animation: spin 0.9s linear infinite;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

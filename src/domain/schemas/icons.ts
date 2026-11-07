@@ -1,0 +1,87 @@
+import { z } from 'zod';
+
+/**
+ * Curated icon names that designs may reference (KPI badges, list rows).
+ * Stored as plain names so documents stay data-only; the UI maps each name to
+ * an icon component. Unknown names are rejected on import.
+ */
+export const ICON_NAMES = [
+  'wallet',
+  'credit-card',
+  'banknote',
+  'dollar',
+  'euro',
+  'piggy-bank',
+  'landmark',
+  'receipt',
+  'trending-up',
+  'trending-down',
+  'arrow-up-right',
+  'arrow-down-left',
+  'send',
+  'repeat',
+  'shield',
+  'lock',
+  'chart-line',
+  'chart-pie',
+  'chart-bar',
+  'target',
+  'activity',
+  'heart-pulse',
+  'users',
+  'user',
+  'calendar',
+  'clock',
+  'shopping-bag',
+  'home',
+  'car',
+  'utensils',
+  'film',
+  'plane',
+  'briefcase',
+  'building',
+  'cloud',
+  'cpu',
+  'database',
+  'zap',
+  'globe',
+  'gift',
+  'package',
+  'truck',
+  'star',
+  'bell',
+  'check',
+  'alert',
+  'library',
+  'graduation-cap',
+  'book-open',
+  'award',
+  'bot',
+  'sparkles',
+  'megaphone',
+  'clipboard',
+  'shopping-cart',
+  'eye',
+  'tag',
+  'mouse-pointer',
+  'percent',
+  'code',
+  'palette',
+  'circle-dollar',
+  'moon',
+  'footprints',
+  'flame',
+  'dumbbell',
+  'heart',
+  'refresh',
+  'person-standing',
+  'timer',
+  'apple',
+] as const;
+
+export const iconNameSchema = z.enum(ICON_NAMES);
+export type IconName = z.infer<typeof iconNameSchema>;
+
+export function isIconName(value: unknown): value is IconName {
+  return typeof value === 'string' && (ICON_NAMES as readonly string[]).includes(value);
+}

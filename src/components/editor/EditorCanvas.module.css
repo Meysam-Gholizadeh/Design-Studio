@@ -1,0 +1,266 @@
+.workspace {
+  position: relative;
+  height: 100%;
+  overflow: auto;
+  padding: 32px;
+  background:
+    radial-gradient(circle at 1px 1px, rgba(16, 24, 40, 0.07) 1px, transparent 0) 0 0 / 18px 18px,
+    var(--app-workspace);
+}
+
+.pageFrame {
+  position: relative;
+  margin: 0 auto;
+  box-shadow:
+    0 0 0 1px rgba(16, 24, 40, 0.08),
+    0 12px 32px -12px rgba(16, 24, 40, 0.28);
+  border-radius: 2px;
+}
+
+/* The page is rendered at design size and scaled; `--canvas-scale` lets chrome stay screen-sized. */
+.page {
+  --px: calc(1px / var(--canvas-scale, 1));
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  overflow: hidden;
+  background: var(--ds-page-bg);
+  font-family: var(--ds-font);
+  color: var(--ds-text);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.gridBackground {
+  position: absolute !important;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+/* Grid guides appear while moving, resizing or dropping. */
+.page[data-interacting] .gridBackground,
+.page:has(.dropPreview) .gridBackground {
+  opacity: 1;
+}
+
+.grid {
+  position: absolute !important;
+  inset: 0;
+}
+
+.item {
+  display: flex;
+}
+
+.itemInner {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  border-radius: var(--ds-radius);
+  outline: none;
+  cursor: grab;
+}
+
+.itemInner::after {
+  content: '';
+  position: absolute;
+  inset: calc(-3 * var(--px));
+  border-radius: calc(var(--ds-radius) + 3 * var(--px));
+  border: calc(2 * var(--px)) solid transparent;
+  pointer-events: none;
+  transition: border-color 0.12s;
+}
+
+.itemInner:hover::after {
+  border-color: rgba(35, 70, 216, 0.4);
+}
+
+.itemInner:focus-visible::after {
+  border-color: rgba(35, 70, 216, 0.7);
+  border-style: dashed;
+}
+
+.itemInner[data-selected]::after {
+  border-color: #2346d8;
+  border-style: solid;
+  box-shadow: 0 0 0 calc(4 * var(--px)) rgba(35, 70, 216, 0.15);
+}
+
+:global(.react-draggable-dragging) .itemInner {
+  cursor: grabbing;
+}
+
+/* Visual content is inert while editing: the card is selected/dragged as a whole. */
+.visual {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.itemInner[data-hidden] .visual {
+  opacity: 0.35;
+}
+
+.badges {
+  position: absolute;
+  top: calc(6 * var(--px));
+  right: calc(6 * var(--px));
+  display: flex;
+  gap: calc(4 * var(--px));
+  pointer-events: none;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(4 * var(--px));
+  padding: calc(3 * var(--px)) calc(8 * var(--px));
+  border-radius: 999px;
+  background: rgba(16, 24, 40, 0.78);
+  color: #fff;
+  font-size: calc(11 * var(--px));
+  font-weight: 600;
+  font-family: var(--font-sans);
+}
+
+.badge svg {
+  width: calc(11 * var(--px));
+  height: calc(11 * var(--px));
+}
+
+/* Placeholder shown by the grid while moving/resizing. */
+.grid :global(.react-grid-item.react-grid-placeholder) {
+  background: rgba(35, 70, 216, 0.14);
+  border: calc(2 * var(--px)) dashed rgba(35, 70, 216, 0.75);
+  border-radius: var(--ds-radius);
+  opacity: 1;
+}
+
+/* Resize handles: only present on the selected visual (isResizable). */
+.grid :global(.react-grid-item > .react-resizable-handle) {
+  --h: calc(12 * var(--px));
+  width: var(--h);
+  height: var(--h);
+  opacity: 1;
+  z-index: 5;
+  transform: none;
+  background: #fff;
+  border: calc(2 * var(--px)) solid #2346d8;
+  border-radius: calc(3 * var(--px));
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.3);
+}
+
+.grid :global(.react-grid-item > .react-resizable-handle::after) {
+  display: none;
+}
+
+.grid :global(.react-grid-item > .react-resizable-handle-se) {
+  right: calc(var(--h) / -2);
+  bottom: calc(var(--h) / -2);
+  cursor: nwse-resize;
+}
+.grid :global(.react-grid-item > .react-resizable-handle-sw) {
+  left: calc(var(--h) / -2);
+  bottom: calc(var(--h) / -2);
+  cursor: nesw-resize;
+}
+.grid :global(.react-grid-item > .react-resizable-handle-ne) {
+  right: calc(var(--h) / -2);
+  top: calc(var(--h) / -2);
+  cursor: nesw-resize;
+}
+.grid :global(.react-grid-item > .react-resizable-handle-nw) {
+  left: calc(var(--h) / -2);
+  top: calc(var(--h) / -2);
+  cursor: nwse-resize;
+}
+.grid :global(.react-grid-item > .react-resizable-handle-e) {
+  right: calc(var(--h) / -2);
+  top: calc(50% - var(--h) / 2);
+  cursor: ew-resize;
+}
+.grid :global(.react-grid-item > .react-resizable-handle-w) {
+  left: calc(var(--h) / -2);
+  top: calc(50% - var(--h) / 2);
+  cursor: ew-resize;
+}
+.grid :global(.react-grid-item > .react-resizable-handle-n) {
+  top: calc(var(--h) / -2);
+  left: calc(50% - var(--h) / 2);
+  cursor: ns-resize;
+}
+.grid :global(.react-grid-item > .react-resizable-handle-s) {
+  bottom: calc(var(--h) / -2);
+  left: calc(50% - var(--h) / 2);
+  cursor: ns-resize;
+}
+
+.dropPreview {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: calc(2 * var(--px)) dashed #2346d8;
+  border-radius: var(--ds-radius);
+  background: rgba(35, 70, 216, 0.12);
+  pointer-events: none;
+  transition:
+    left 0.08s,
+    top 0.08s;
+}
+
+.dropPreview[data-full] {
+  inset: 0;
+  border-color: #c4302b;
+  background: rgba(196, 48, 43, 0.08);
+}
+
+.dropLabel {
+  padding: calc(5 * var(--px)) calc(12 * var(--px));
+  border-radius: 999px;
+  background: #2346d8;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: calc(12.5 * var(--px));
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dropPreview[data-full] .dropLabel {
+  background: #c4302b;
+}
+
+.empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  pointer-events: none;
+  color: var(--app-text-3);
+  padding: 24px;
+}
+
+.empty svg {
+  color: var(--app-accent);
+  margin-bottom: 8px;
+}
+
+.emptyTitle {
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--app-text);
+}
+
+.emptyText {
+  font-size: 13.5px;
+}

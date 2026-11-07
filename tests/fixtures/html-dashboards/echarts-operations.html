@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Operations Overview</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #0f172a; color: #e2e8f0; }
+    .wrap { padding: 24px 32px; }
+    h1 { font-size: 28px; margin: 0 0 20px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .panel { background: #1e293b; border-radius: 10px; padding: 16px; }
+    .panel h2 { font-size: 15px; margin: 0 0 8px; color: #f8fafc; }
+    .chart { height: 280px; }
+    .wide { grid-column: span 2; }
+    .stat { font-size: 32px; font-weight: 700; }
+    .label { font-size: 13px; color: #94a3b8; }
+    .bad { color: #f87171; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Operations Overview</h1>
+    <div class="grid" style="margin-bottom:16px">
+      <div class="panel"><div class="label">Units produced</div><div class="stat">128.4K</div><div class="label">vs last week</div></div>
+      <div class="panel"><div class="label">Defect rate</div><div class="stat">1.9%</div><div class="bad">▲ 0.4% vs last week</div></div>
+      <div class="panel"><div class="label">Downtime</div><div class="stat">14.5 hrs</div></div>
+    </div>
+    <div class="grid">
+      <div class="panel wide"><h2>Output by Line</h2><div id="area" class="chart"></div></div>
+      <div class="panel"><h2>Overall Equipment Effectiveness</h2><div id="gauge" class="chart"></div></div>
+      <div class="panel"><h2>Defects by Cause</h2><div id="pie" class="chart"></div></div>
+      <div class="panel"><h2>Throughput vs Cycle Time</h2><div id="scatter" class="chart"></div></div>
+      <div class="panel"><h2>Scrap by Plant</h2><div id="bars" class="chart"></div></div>
+    </div>
+  </div>
+  <script>
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    echarts.init(document.getElementById('area')).setOption({
+      color: ['#38bdf8', '#a78bfa', '#34d399'],
+      legend: { textStyle: { color: '#e2e8f0' } },
+      xAxis: { type: 'category', data: days },
+      yAxis: { type: 'value' },
+      series: [
+        { name: 'Line A', type: 'line', stack: 'total', areaStyle: {}, smooth: true, data: [5200, 5400, 5100, 5600, 5800, 4200, 3900] },
+        { name: 'Line B', type: 'line', stack: 'total', areaStyle: {}, smooth: true, data: [4100, 4300, 4250, 4400, 4500, 3600, 3300] },
+        { name: 'Line C', type: 'line', stack: 'total', areaStyle: {}, smooth: true, data: [3000, 3100, 2900, 3200, 3300, 2500, 2400] }
+      ]
+    });
+    echarts.init(document.getElementById('gauge')).setOption({
+      series: [{ type: 'gauge', min: 0, max: 100, data: [{ value: 82.5, name: 'OEE' }] }]
+    });
+    echarts.init(document.getElementById('pie')).setOption({
+      series: [{ type: 'pie', radius: ['45%', '70%'], data: [
+        { name: 'Material', value: 42 }, { name: 'Machine', value: 31 }, { name: 'Operator', value: 18 }, { name: 'Other', value: 9 }
+      ] }]
+    });
+    echarts.init(document.getElementById('scatter')).setOption({
+      xAxis: {}, yAxis: {},
+      series: [{ type: 'scatter', data: [[10, 8.04], [8, 6.95], [13, 7.58], [9, 8.81], [11, 8.33]] }]
+    });
+    echarts.init(document.getElementById('bars')).setOption({
+      xAxis: { type: 'value', axisLabel: { formatter: '{value} t' } },
+      yAxis: { type: 'category', data: ['Leeds', 'Lyon', 'Lodz'] },
+      series: [{ name: 'Scrap', type: 'bar', data: [12.4, 9.8, 7.1] }]
+    });
+  </script>
+</body>
+</html>

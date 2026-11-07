@@ -1,0 +1,28 @@
+.page {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-10) var(--space-12);
+}
+
+.section {
+  margin-top: var(--space-10);
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin-bottom: var(--space-2);
+}
+
+.sectionDescription {
+  color: var(--app-text-2);
+  margin-bottom: var(--space-5);
+  max-width: 720px;
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding: var(--space-6) var(--space-4) var(--space-10);
+  }
+}

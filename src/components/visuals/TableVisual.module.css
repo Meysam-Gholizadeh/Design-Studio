@@ -1,0 +1,210 @@
+.scroller {
+  height: 100%;
+  overflow: auto;
+  outline: none;
+  scrollbar-width: thin;
+}
+
+.scroller:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--ds-primary);
+  border-radius: 4px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+  color: var(--ds-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--ds-surface);
+  color: var(--ds-muted);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--ds-border);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--ds-border);
+  white-space: nowrap;
+}
+
+.table[data-density='compact'] th,
+.table[data-density='compact'] td {
+  padding: 5px 8px;
+}
+
+.table[data-striped] tbody tr:nth-child(even) td {
+  background: var(--ds-surface-alt);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table td[data-negative],
+.table td[data-tone='negative'] {
+  color: var(--ds-negative);
+}
+
+.table td[data-tone='positive'] {
+  color: var(--ds-positive);
+}
+
+/* Icon badge + two-line cell (list style). */
+.rich {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.iconBadge {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ds-surface-alt);
+  border: 1px solid var(--ds-border);
+  color: var(--ds-text);
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+td[data-align='right'] .lines {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.iconBadge[data-tone='accent'] {
+  color: var(--ds-primary);
+  background: color-mix(in srgb, var(--ds-primary) 9%, transparent);
+  border-color: color-mix(in srgb, var(--ds-primary) 40%, transparent);
+}
+
+/* Rounded photo thumbnail. */
+.thumb {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 38px;
+  border-radius: 9px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px var(--ds-border);
+}
+
+/* Initials avatar. */
+.avatar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ds-text);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--ds-text) 22%, var(--ds-surface-alt)), var(--ds-surface-alt));
+  border: 1.5px solid color-mix(in srgb, var(--ds-primary) 45%, transparent);
+}
+
+/* Rank and other emphasised cells. */
+.table td[data-display='accent'] {
+  color: var(--ds-primary);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.rating svg {
+  color: var(--ds-primary);
+  fill: currentColor;
+}
+
+.primary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.secondary {
+  font-size: 10.5px;
+  color: var(--ds-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Status pill. */
+.pill {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  border: 1px solid transparent;
+}
+
+.pill[data-tone='positive'] {
+  color: var(--ds-positive);
+  background: color-mix(in srgb, var(--ds-positive) 14%, transparent);
+  border-color: color-mix(in srgb, var(--ds-positive) 30%, transparent);
+}
+
+.pill[data-tone='negative'] {
+  color: var(--ds-negative);
+  background: color-mix(in srgb, var(--ds-negative) 14%, transparent);
+  border-color: color-mix(in srgb, var(--ds-negative) 30%, transparent);
+}
+
+.pill[data-tone='warning'] {
+  color: var(--ds-primary);
+  background: color-mix(in srgb, var(--ds-primary) 14%, transparent);
+  border-color: color-mix(in srgb, var(--ds-primary) 30%, transparent);
+}
+
+.pill[data-tone='neutral'] {
+  color: var(--ds-muted);
+  background: var(--ds-surface-alt);
+  border-color: var(--ds-border);
+}
+
+.table tfoot td {
+  position: sticky;
+  bottom: 0;
+  background: var(--ds-surface);
+  font-weight: 600;
+  border-top: 1px solid var(--ds-border);
+  border-bottom: none;
+}
+
+.empty {
+  text-align: center;
+  color: var(--ds-muted);
+  padding: 20px 10px;
+}

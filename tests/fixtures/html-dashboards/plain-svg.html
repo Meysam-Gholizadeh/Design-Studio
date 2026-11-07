@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Support Center</title>
+  <style>
+    body { margin: 0; font-family: Georgia, serif; background: #ffffff; color: #222; }
+    .page { padding: 32px; }
+    h1 { font-size: 30px; margin: 0 0 24px; }
+    .tiles { display: flex; gap: 20px; margin-bottom: 24px; }
+    .tile { flex: 1; border: 1px solid #ddd; border-radius: 6px; padding: 16px; }
+    .tile .n { font-size: 34px; font-weight: bold; }
+    .tile .t { font-size: 13px; color: #666; }
+    .two { display: flex; gap: 20px; }
+    .box { flex: 1; border: 1px solid #ddd; border-radius: 6px; padding: 16px; }
+    .box h2 { font-size: 16px; margin: 0 0 12px; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border-bottom: 1px solid #eee; padding: 6px; text-align: left; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Support Center</h1>
+    <div class="tiles">
+      <div class="tile"><div class="t">Open tickets</div><div class="n">1,204</div></div>
+      <div class="tile"><div class="t">First response</div><div class="n">2.4 hrs</div></div>
+      <div class="tile"><div class="t">CSAT</div><div class="n">92%</div></div>
+    </div>
+    <div class="two">
+      <div class="box">
+        <h2>Tickets per Day</h2>
+        <svg width="460" height="220" viewBox="0 0 460 220">
+          <rect x="10" y="100" width="50" height="110" fill="#4f46e5"></rect>
+          <rect x="80" y="60" width="50" height="150" fill="#4f46e5"></rect>
+          <rect x="150" y="80" width="50" height="130" fill="#4f46e5"></rect>
+          <rect x="220" y="40" width="50" height="170" fill="#4f46e5"></rect>
+          <rect x="290" y="120" width="50" height="90" fill="#4f46e5"></rect>
+        </svg>
+      </div>
+      <div class="box">
+        <h2>Agents</h2>
+        <table>
+          <tr><th>Agent</th><th>Solved</th><th>CSAT</th></tr>
+          <tr><td>Ana</td><td>320</td><td>94%</td></tr>
+          <tr><td>Ben</td><td>288</td><td>91%</td></tr>
+          <tr><td>Chloé</td><td>301</td><td>95%</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

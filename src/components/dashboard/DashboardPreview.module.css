@@ -1,0 +1,67 @@
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.tabs {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-border);
+  border-radius: var(--radius-md);
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.tab {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--app-text-2);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--app-text);
+}
+
+.tab[aria-selected='true'] {
+  background: var(--app-surface);
+  color: var(--app-text);
+  font-weight: 600;
+  box-shadow: var(--shadow-xs);
+}
+
+.tab:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.singlePage {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-text-2);
+}
+
+.stage {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--app-border);
+  box-shadow: var(--shadow-md);
+  background: var(--app-surface);
+}

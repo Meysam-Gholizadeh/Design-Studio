@@ -1,0 +1,221 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--space-4) var(--space-3);
+  background: var(--app-surface);
+  border-right: 1px solid var(--app-border);
+  overflow-y: auto;
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 2px 16px;
+  min-height: 52px;
+}
+
+.brandWrap {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.toggle {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--app-text-2);
+  cursor: pointer;
+  transition: background-color 0.15s var(--ease-out), color 0.15s var(--ease-out);
+}
+
+.toggle:hover {
+  background: var(--app-surface-2);
+  color: var(--app-text);
+}
+
+.toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.icon {
+  flex: 0 0 auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brandName {
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  color: var(--app-text);
+  white-space: nowrap;
+}
+
+.brandName strong {
+  font-weight: 700;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: var(--radius-md);
+  color: var(--app-text-2);
+  font-weight: 500;
+  font-size: 14px;
+  transition: background-color 0.15s var(--ease-out), color 0.15s var(--ease-out);
+}
+
+.link:hover {
+  background: var(--app-surface-2);
+  color: var(--app-text);
+  text-decoration: none;
+}
+
+.active,
+.active:hover {
+  background: var(--app-accent-soft);
+  color: var(--app-accent-text);
+  font-weight: 600;
+}
+
+.label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--app-surface-2);
+  color: var(--app-text-3);
+  border: 1px solid var(--app-border);
+}
+
+.sectionLabel {
+  margin: 20px 10px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-text-3);
+}
+
+.footer {
+  margin-top: auto;
+  padding: 16px 10px 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--app-text-3);
+}
+
+/* ------------------------------------------------------------------ */
+/* Collapsed icon rail (desktop)                                       */
+/* ------------------------------------------------------------------ */
+
+.sidebar[data-collapsed] {
+  /* Tooltips extend beyond the rail. */
+  overflow: visible;
+  align-items: center;
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+}
+
+.sidebar[data-collapsed] .brandWrap,
+.sidebar[data-collapsed] .footer,
+.sidebar[data-collapsed] .badge {
+  display: none;
+}
+
+.sidebar[data-collapsed] .brandRow {
+  padding: 0 0 16px;
+  justify-content: center;
+}
+
+.sidebar[data-collapsed] .list {
+  width: 100%;
+  align-items: center;
+}
+
+.sidebar[data-collapsed] .link {
+  position: relative;
+  width: 40px;
+  padding: 0;
+  justify-content: center;
+}
+
+/* The section heading becomes a thin divider. */
+.sidebar[data-collapsed] .sectionLabel {
+  width: 28px;
+  height: 1px;
+  margin: 14px auto;
+  overflow: hidden;
+  color: transparent;
+  background: var(--app-border);
+}
+
+/* Label: visually hidden (still the accessible name) until hover / keyboard focus, then a tooltip. */
+.sidebar[data-collapsed] .label {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  z-index: 70;
+  flex: none;
+  padding: 5px 10px;
+  border-radius: var(--radius-md);
+  background: var(--app-text);
+  color: var(--app-surface);
+  font-size: 12.5px;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-4px, -50%);
+  transition: opacity 0.12s var(--ease-out), transform 0.12s var(--ease-out);
+  clip-path: inset(50%);
+}
+
+.sidebar[data-collapsed] .link:hover .label,
+.sidebar[data-collapsed] .link:focus-visible .label {
+  opacity: 1;
+  transform: translate(0, -50%);
+  clip-path: none;
+}
+
+.sidebar[data-collapsed] .link:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+@media (max-width: 900px) {
+  /* Phones and small tablets use the slide-in drawer; the rail toggle is not shown there. */
+  .toggle {
+    display: none;
+  }
+}

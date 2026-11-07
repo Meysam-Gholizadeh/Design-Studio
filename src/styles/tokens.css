@@ -1,0 +1,62 @@
+/*
+ * App chrome design tokens. These style the studio itself and are deliberately
+ * separate from dashboard theme tokens (--ds-*), which only apply inside a
+ * rendered dashboard.
+ */
+:root {
+  --font-sans: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --app-bg: #f5f6f8;
+  --app-surface: #ffffff;
+  --app-surface-2: #f0f2f5;
+  --app-surface-3: #e7eaef;
+  --app-border: #e2e5ea;
+  --app-border-strong: #cfd4dc;
+
+  --app-text: #101828;
+  --app-text-2: #475467;
+  --app-text-3: #667085;
+
+  --app-accent: #2346d8;
+  --app-accent-hover: #1c39b6;
+  --app-accent-soft: #eef1fd;
+  --app-accent-text: #1c39b6;
+  --app-on-accent: #ffffff;
+
+  --app-success: #117a4b;
+  --app-success-soft: #e8f6ef;
+  --app-warning: #9a5b00;
+  --app-warning-soft: #fdf3e1;
+  --app-danger: #c4302b;
+  --app-danger-soft: #fdecea;
+
+  --app-workspace: #e9ecf1;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-md: 0 6px 16px -4px rgba(16, 24, 40, 0.1), 0 2px 6px -2px rgba(16, 24, 40, 0.05);
+  --shadow-lg: 0 20px 40px -12px rgba(16, 24, 40, 0.22);
+
+  --focus-ring: 0 0 0 3px rgba(35, 70, 216, 0.28);
+
+  --sidebar-width: 236px;
+  --sidebar-collapsed-width: 64px;
+  --topbar-height: 60px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

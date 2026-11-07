@@ -1,0 +1,18 @@
+.notice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--app-warning-soft);
+  color: var(--app-warning);
+  font-size: 12px;
+  font-weight: 550;
+  white-space: nowrap;
+}
+
+.notice[data-compact] {
+  padding: 2px 8px;
+  font-size: 11px;
+  gap: 4px;
+}

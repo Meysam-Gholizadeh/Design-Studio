@@ -1,0 +1,362 @@
+.kpi {
+  container-type: size;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  --kpi-scale: 1;
+}
+
+.kpi[data-size='md'] {
+  --kpi-scale: 0.8;
+}
+
+.kpi[data-size='xl'] {
+  --kpi-scale: 1.25;
+}
+
+.kpi[data-align='center'] {
+  align-items: center;
+  text-align: center;
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.kpi[data-align='center'] .labelRow {
+  justify-content: center;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ds-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.icon {
+  flex: 0 0 auto;
+  color: var(--ds-muted);
+  opacity: 0.9;
+}
+
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.kpi[data-align='center'] .valueRow {
+  justify-content: center;
+}
+
+/* Inline style: the change sits at the right of the value as compact coloured text. */
+.kpi[data-trend-style='inline'] .valueRow {
+  justify-content: space-between;
+}
+
+.inlineTrend {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.inlineTrend[data-tone='positive'] {
+  color: var(--ds-positive);
+}
+
+.inlineTrend[data-tone='negative'] {
+  color: var(--ds-negative);
+}
+
+.inlineTrend[data-tone='neutral'] {
+  color: var(--ds-muted);
+}
+
+.value {
+  font-size: clamp(18px, calc(min(26cqh, 15cqw) * var(--kpi-scale)), 56px);
+  line-height: 1.1;
+  font-weight: var(--ds-heading-weight, 600);
+  color: var(--ds-text);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.trendRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 11.5px;
+  min-width: 0;
+}
+
+.kpi[data-align='center'] .trendRow {
+  justify-content: center;
+}
+
+.trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.trend[data-tone='positive'] {
+  color: var(--ds-positive);
+}
+
+.trend[data-tone='negative'] {
+  color: var(--ds-negative);
+}
+
+.trend[data-tone='neutral'] {
+  color: var(--ds-muted);
+}
+
+.comparisonLabel {
+  color: var(--ds-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.target {
+  font-size: 11.5px;
+  color: var(--ds-muted);
+}
+
+.spark {
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: 44px;
+  margin-top: 4px;
+  width: 100%;
+}
+
+/* Illustration on the right; the content keeps clear of it. */
+.kpi[data-illustrated] {
+  position: relative;
+  padding-right: 34%;
+}
+
+.illustration {
+  position: absolute;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34%;
+  height: 112%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* With a supporting overline, the label reads as the card title. */
+.overline {
+  font-size: 11.5px;
+  color: var(--ds-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.label[data-strong] {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+/* Raised currency symbol. */
+.symbol {
+  font-size: 0.42em;
+  font-weight: 500;
+  color: var(--ds-muted);
+  vertical-align: 0.95em;
+  margin-right: 0.08em;
+  letter-spacing: 0;
+}
+
+/* Supporting figures beside the value. */
+.details {
+  display: flex;
+  gap: 18px;
+  margin: 0 0 0 12px;
+  align-self: center;
+}
+
+.detail dt {
+  font-size: 11px;
+  color: var(--ds-muted);
+}
+
+.detail dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ds-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Row layout: [badge] [label · value · change] [bar ladder]. */
+.kpi[data-layout='row'] {
+  justify-content: center;
+}
+
+.rowTop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.badge {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--ds-primary);
+  background: color-mix(in srgb, var(--ds-primary) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ds-primary) 45%, transparent);
+  box-shadow: inset 0 0 12px color-mix(in srgb, var(--ds-primary) 12%, transparent);
+}
+
+.kpi[data-layout='row'] .trend svg {
+  margin-right: 3px;
+}
+
+.ladder {
+  flex: 0 0 auto;
+  align-self: stretch;
+  max-height: 64px;
+  margin: auto 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 70%;
+}
+
+.ladder span {
+  width: 5px;
+  border-radius: 2px 2px 0 0;
+  background: linear-gradient(to bottom, var(--ds-primary), color-mix(in srgb, var(--ds-primary) 25%, transparent));
+}
+
+/* Labelled columns (weekly visitors). */
+.columnsWrap {
+  flex: 1 1 0;
+  min-height: 0;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.columns {
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.column {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.columnTrack {
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  max-width: 22px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.columnTrack span {
+  width: 100%;
+  border-radius: 999px;
+  background: var(--ds-surface-alt);
+  box-shadow: inset 0 0 0 1px var(--ds-border);
+}
+
+.columnTrack span[data-peak] {
+  background: var(--ds-primary);
+  box-shadow: 0 0 14px -2px color-mix(in srgb, var(--ds-primary) 60%, transparent);
+}
+
+.columnLabel {
+  font-size: 10.5px;
+  color: var(--ds-muted);
+}
+
+.columnLabel[data-current] {
+  color: var(--ds-text);
+  font-weight: 600;
+}
+
+.columnTrack span {
+  position: relative;
+}
+
+/* Accent columns: every column in a fading accent gradient; the highlighted one is brighter and glows. */
+.columns[data-fill='accent'] .columnTrack span {
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ds-primary) 85%, transparent), color-mix(in srgb, var(--ds-primary) 22%, transparent));
+  box-shadow: none;
+}
+
+.columns[data-fill='accent'] .columnTrack span[data-peak] {
+  background: linear-gradient(to bottom, var(--ds-primary), color-mix(in srgb, var(--ds-primary) 35%, transparent));
+  box-shadow: 0 0 16px -3px color-mix(in srgb, var(--ds-primary) 70%, transparent);
+}
+
+.bubble {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: var(--ds-surface-alt);
+  border: 1px solid var(--ds-border);
+  color: var(--ds-text);
+  font-size: 10.5px;
+  font-style: normal;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.columnTrack {
+  overflow: visible;
+}
