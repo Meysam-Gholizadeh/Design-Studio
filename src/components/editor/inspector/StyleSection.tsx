@@ -45,6 +45,14 @@ export function StyleSection({ component, update }: SectionProps) {
         </>
       )}
       {component.type !== 'divider' && (
+        <ColorField
+          label="Text colour"
+          value={s.textColor}
+          fallback="#FFFFFF"
+          onChange={(v) => set({ textColor: v }, 'text-color')}
+        />
+      )}
+      {component.type !== 'divider' && (
         <SelectField
           label="Subtitle position"
           value={s.subtitlePlacement ?? 'below'}

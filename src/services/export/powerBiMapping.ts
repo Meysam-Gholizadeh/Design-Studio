@@ -18,9 +18,14 @@ export interface PowerBiVisualSuggestion {
   /**
    * How the generated Power BI project draws this component: the native
    * visual above, the native visual over a picture of the card surface, or the
-   * certified "HTML Content Secure" visual (with the reasons).
+   * certified "HTML Content Secure" visual (with the reasons). `parts` lists
+   * extra built-in visuals stacked with the native one (change card, icon
+   * picture, donut ring).
    */
-  rendering?: { kind: 'native' } | { kind: 'native-with-card-background'; features: string[] } | { kind: 'html-content'; visual: string; features: string[] };
+  rendering?:
+    | { kind: 'native'; parts?: string[] }
+    | { kind: 'native-with-card-background'; features: string[]; parts?: string[] }
+    | { kind: 'html-content'; visual: string; features: string[] };
 }
 
 export interface FormatSpec {

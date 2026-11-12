@@ -19,7 +19,7 @@ function contrast(a: string, b: string): number {
 
 describe('themes', () => {
   it('provides the required themes with stable IDs', () => {
-    expect(THEMES.map((t) => t.id)).toEqual(['corporate-blue', 'minimal-light', 'modern-dark', 'vibrant', 'clinical-calm', 'warm-coral', 'midnight-ember', 'obsidian-amber', 'graphite-copper', 'volt-lime']);
+    expect(THEMES.map((t) => t.id)).toEqual(['corporate-blue', 'minimal-light', 'modern-dark', 'vibrant', 'clinical-calm', 'warm-coral', 'midnight-ember', 'obsidian-amber', 'graphite-copper', 'volt-lime', 'fresh-mint']);
   });
 
   it('accepts at most two shadows made only of numbers and rgba colours', () => {

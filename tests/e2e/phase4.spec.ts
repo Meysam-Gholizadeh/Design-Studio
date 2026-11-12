@@ -122,7 +122,7 @@ test('layouts: an empty page gets sample visuals; a populated page asks first an
 test('Themes & Layouts page: theme cards, layout wireframes, and starting a design from them', async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto('/themes');
-  await expect(page.getByRole('radio')).toHaveCount(10);
+  await expect(page.getByRole('radio')).toHaveCount(11);
   await expect(page.getByRole('img', { name: /Executive Overview layout/ })).toBeVisible();
   await expect(page.getByRole('img', { name: /Storytelling layout/ })).toBeVisible();
 

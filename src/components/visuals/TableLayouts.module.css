@@ -1,0 +1,242 @@
+/* Progress cell: "Task Done 7/10" with a pill bar (accent fill, hatched remainder). */
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.progressHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 10.5px;
+  color: var(--ds-muted);
+}
+
+.progressValue strong {
+  color: var(--ds-text);
+  font-weight: 600;
+}
+
+.progressTrack {
+  position: relative;
+  height: 14px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--ds-surface-alt) 0 3px,
+    color-mix(in srgb, var(--ds-text) 12%, var(--ds-surface-alt)) 3px 4.5px
+  );
+}
+
+.progressTrack span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ds-primary) 85%, #ffffff), var(--ds-primary));
+}
+
+/* Cards layout. */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  /* Rows share the card's height, so a few people fill the panel instead of leaving a gap below. */
+  grid-auto-rows: minmax(92px, 1fr);
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  height: 100%;
+  align-content: stretch;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 11px 11px;
+  border-radius: 12px;
+  background: var(--ds-surface-alt);
+  border: 1px solid var(--ds-border);
+  min-width: 0;
+}
+
+.lead {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 2px var(--ds-surface);
+}
+
+.leadIcon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  flex: 0 0 auto;
+  color: var(--ds-primary);
+  background: color-mix(in srgb, var(--ds-primary) 14%, transparent);
+}
+
+.leadText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.leadName {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ds-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leadSecond {
+  font-size: 11px;
+  color: var(--ds-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.field {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.fieldLabel {
+  color: var(--ds-muted);
+}
+
+.fieldValue {
+  color: var(--ds-text);
+  font-weight: 600;
+}
+
+/* Tiles layout. */
+.tilesWrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tiles {
+  flex: 1 1 0;
+  min-height: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.tileValue {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--ds-text);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.tileUnit {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ds-muted);
+  margin-left: 1px;
+}
+
+/* Patterned block: two offset dot grids in the tile colour over a light tint. */
+.tileBlock {
+  flex: 1 1 0;
+  min-height: 24px;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--tile) 75%, transparent) 1.7px, transparent 2.2px) 0 0 / 11px 11px,
+    radial-gradient(circle, color-mix(in srgb, var(--tile) 45%, transparent) 1.2px, transparent 1.7px) 5.5px 5.5px / 11px 11px,
+    color-mix(in srgb, var(--tile) 16%, var(--ds-surface));
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+  color: var(--ds-muted);
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+/* Chips layout. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  height: 100%;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.chip svg {
+  color: var(--ds-primary);
+}

@@ -337,6 +337,23 @@ export function TableSection({ component: c, update }: SectionProps<Table>) {
       </Section>
 
       <Section title="Display" collapsible defaultOpen>
+        <SelectField
+          label="Layout"
+          value={c.config.layout ?? 'table'}
+          options={[
+            { value: 'table', label: 'Table rows' },
+            { value: 'cards', label: 'Cards (first column leads, with photo or icon)' },
+            { value: 'tiles', label: 'Score tiles (value over a patterned block)' },
+            { value: 'chips', label: 'Chips (first column as pills)' },
+          ]}
+          hint={c.config.layout && c.config.layout !== 'table' ? 'Exported to Power BI with the HTML Content visual.' : undefined}
+          onChange={(v) =>
+            edit((d) => {
+              if (v === 'table') delete d.config.layout;
+              else d.config.layout = v;
+            }, 'layout')
+          }
+        />
         <Toggle label="Header row" checked={c.config.showHeader} onChange={(v) => edit((d) => void (d.config.showHeader = v), 'header')} />
         <Toggle label="Striped rows" checked={c.config.striped} onChange={(v) => edit((d) => void (d.config.striped = v), 'striped')} />
         <Toggle label="Highlight negative numbers" checked={c.config.highlightNegative} onChange={(v) => edit((d) => void (d.config.highlightNegative = v), 'negative')} />

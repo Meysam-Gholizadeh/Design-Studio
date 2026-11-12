@@ -44,6 +44,21 @@ Downloaded and prepared by `scripts/prepare-fitness-photos.mjs` (cover-cropped a
 
 Both images were made for this project; nothing was copied from the reference screenshots.
 
+## HR Pulse Overview
+
+Portraits from [Pexels](https://www.pexels.com/license/) (free to use, no attribution required; credited anyway). `scripts/prepare-hr-assets.mjs` downloads them and crops them to 96 × 96 face squares in `src/data/templates/hr/images/`. The people shown are not the fictional employees named in the template.
+
+| File | Used for | Photographer | Source |
+|---|---|---|---|
+| `avatar-1.jpg` | Onboarding: Daniel Brooks | Lubomir Satko | https://www.pexels.com/photo/12437056/ |
+| `avatar-2.jpg` | Onboarding: Emma Clarke | Mizuno K | https://www.pexels.com/photo/12903030/ |
+| `avatar-3.jpg` | Onboarding: Lukas Weber | Christoph Sixt | https://www.pexels.com/photo/29856511/ |
+| `avatar-4.jpg` | Onboarding: Amara Bello | Ramy Photographer | https://www.pexels.com/photo/36551042/ |
+| `avatar-5.jpg` | Onboarding: Grace Holloway | Glennese Patterson | https://www.pexels.com/photo/40062811/ |
+| `avatar-6.jpg` | Onboarding: Omar Haddad | Uiliam Nörnberg | https://www.pexels.com/photo/30767565/ |
+
+`hero-background.jpg` is the page background: a dark-green hero band, glows, rings around the efficiency gauge, dotted connectors to the six metrics and the white assistant panel. It and `ai-orb.png` (the assistant's glowing orb) are original artwork, drawn as SVG on the template's grid and rendered by the same script.
+
 ## Adding images to templates
 - Keep each file small (≤ ~60 KB). The schema limits an image to 700 KB as a data URL.
 - Import with `?inline`, e.g. `import photo from './images/x.jpg?inline'`. Vite turns it into a `data:image/jpeg;base64,…` URL, the only image form the design schema accepts (no remote URLs, no SVG).

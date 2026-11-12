@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { LIMITS, SCHEMA_VERSION } from '../limits';
 import { maxRowsForHeight, rectsOverlap } from '../grid';
 import { colorSchema, idSchema, isoDateSchema, nameSchema } from './primitives';
-import { dashboardComponentSchema } from './visuals';
+import { dashboardComponentSchema, imageSrcSchema } from './visuals';
 import { themeOverridesSchema } from './theme';
 
 export const gridSettingsSchema = z.object({
@@ -21,6 +21,8 @@ export const canvasSettingsSchema = z.object({
   width: z.number().int().min(LIMITS.canvasMinWidth).max(LIMITS.canvasMaxWidth),
   height: z.number().int().min(LIMITS.canvasMinHeight).max(LIMITS.canvasMaxHeight),
   background: colorSchema.optional(),
+  /** Picture stretched over every page behind the visuals (e.g. a hero band); exported as the Power BI page background. */
+  backgroundImage: imageSrcSchema.optional(),
   breakpointMode: z.enum(['responsive', 'fixed']),
 });
 export type CanvasSettings = z.infer<typeof canvasSettingsSchema>;

@@ -11,6 +11,7 @@ import { resolveTheme } from '@/services/themeService';
 import { pageMaxRows } from '@/state/documentOps';
 import { selectActivePage, selectSelectedComponent, useEditorStore } from '@/state/editorStore';
 import { CommitTextField, NumberGroup, Section, SelectField, TextField, Toggle } from './fields/Fields';
+import { BackdropField } from './inspector/BackdropField';
 import { ChartDisplaySection, SeriesDataSection, SliceDataSection } from './inspector/ChartSections';
 import { DividerSection, ImageSection, TextSection } from './inspector/ContentSections';
 import { SlicerSection, TableSection } from './inspector/DataSections';
@@ -209,7 +210,7 @@ function VisualProperties({ component }: { component: DashboardComponent }) {
 function PageProperties() {
   const page = useEditorStore(selectActivePage)!;
   const doc = useEditorStore((s) => s.document)!;
-  const { renamePage, setCanvasSize } = useEditorStore.getState();
+  const { renamePage, setCanvasSize, setCanvasBackgroundImage } = useEditorStore.getState();
   const sizeId = PAGE_SIZES.find((s) => s.width === doc.canvas.width && s.height === doc.canvas.height)?.id ?? 'custom';
   const sizeOptions = [
     ...PAGE_SIZES.map((s) => ({ value: s.id as string, label: `${s.label} · ${s.width}×${s.height}` })),
@@ -240,6 +241,15 @@ function PageProperties() {
             const size = PAGE_SIZES.find((s) => s.id === id);
             if (!size) return;
             const r = setCanvasSize({ width: size.width, height: size.height });
+            if (!r.ok) toast.error(r.reason);
+          }}
+        />
+        <BackdropField
+          noun="page background picture"
+          hint="Stretched over every page behind the visuals, e.g. a coloured hero band drawn for this layout. Exported as the Power BI page background."
+          value={doc.canvas.backgroundImage}
+          onChange={(src) => {
+            const r = setCanvasBackgroundImage(src);
             if (!r.ok) toast.error(r.reason);
           }}
         />

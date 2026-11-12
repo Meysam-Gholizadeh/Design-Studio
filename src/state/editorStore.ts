@@ -54,6 +54,8 @@ export interface EditorState {
 
   renameDocument(name: string): ActionResult;
   setCanvasSize(size: { width: number; height: number }): ActionResult;
+  /** Set or remove the page background picture (data URL). One undo step. */
+  setCanvasBackgroundImage(src: string | undefined): ActionResult;
   /** Switch the theme: styling only, never content or positions. One undo step. */
   setTheme(themeId: string): ActionResult;
   /** Apply a layout preset to the active page (see layoutOps). One undo step. */
@@ -208,6 +210,15 @@ export const useEditorStore = create<EditorState>()((set, get) => {
       const r = ops.setCanvasSize(doc, size);
       if (!r.ok) return r;
       get().commit(r.value);
+      return OK;
+    },
+
+    setCanvasBackgroundImage(src) {
+      const doc = get().document;
+      if (!doc) return OK;
+      const r = ops.setCanvasBackgroundImage(doc, src);
+      if (!r.ok) return r;
+      if (r.value !== doc) get().commit(r.value);
       return OK;
     },
 

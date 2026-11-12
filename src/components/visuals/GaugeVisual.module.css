@@ -265,6 +265,17 @@
   max-width: 60%;
 }
 
+/* Value and label inside the ring: nothing beside it, so the ring may use the full width. */
+.ringWrap[data-center='value'] .ring {
+  max-width: 100%;
+}
+
+.ringCenter .caption {
+  max-width: 62%;
+  line-height: 1.3;
+  font-size: clamp(11px, 5.2cqh, 14px);
+}
+
 .ring svg {
   width: 100%;
   height: 100%;

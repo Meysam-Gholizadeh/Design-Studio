@@ -10,6 +10,7 @@ function trackErrors(page: Page): string[] {
 const TEMPLATE_IDS = [
   'finance-performance-overview',
   'personal-finance-hub',
+  'hr-pulse-overview',
   'fitness-overview',
   'learning-platform-overview',
   'storefront-overview',

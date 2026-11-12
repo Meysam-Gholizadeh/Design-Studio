@@ -212,4 +212,19 @@ describe('document', () => {
     expect(bigger.ok).toBe(true);
     if (bigger.ok) expectValid(bigger.value);
   });
+
+  it('sets and removes the page background picture without touching anything else', () => {
+    const doc = blank();
+    const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    const set = ops.setCanvasBackgroundImage(doc, png);
+    expect(set.ok && set.value.canvas.backgroundImage).toBe(png);
+    if (!set.ok) return;
+    expectValid(set.value);
+    expect(set.value.pages).toBe(doc.pages);
+    expect(doc.canvas.backgroundImage).toBeUndefined();
+    const removed = ops.setCanvasBackgroundImage(set.value, undefined);
+    expect(removed.ok && 'backgroundImage' in removed.value.canvas).toBe(false);
+    const same = ops.setCanvasBackgroundImage(set.value, png);
+    expect(same.ok && same.value).toBe(set.value);
+  });
 });

@@ -46,6 +46,8 @@ Scope change (2026-11-05, approved by the user): a Power BI project (PBIP) expor
 
 Scope change (2026-11-05, requested by the user): an "AI Design Assistant" drafts designs from a written brief using Claude, Google Gemini or OpenAI (user's choice; OpenAI added 2026-11-06), called from the browser with the user's own API key (no server). Generated values are fictional sample data. See `docs/AI_ASSISTANT.md`.
 
+Scope change (2026-11-12, requested by the user): an admin page (`/admin`) publishes .pbix reports and .pbiviz custom visuals to the gallery by committing them to the GitHub repository with the owner's own token (no server); the page is meant to sit behind Cloudflare Access. See `docs/PUBLISHING.md`.
+
 Scope change (2026-11-05, requested by the user): an "Import HTML" section converts HTML dashboards (AI-generated, hand-coded or from other tools) into editable designs using deterministic rules — no AI. Imported values are labelled as placeholders copied from the user's file. See `docs/HTML_IMPORT.md`.
 
 ## Engineering expectations

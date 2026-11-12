@@ -51,7 +51,7 @@ Goal (user request): the exported report looks the same as the design in the por
 | --- | --- | --- |
 | **Native** | A built-in visual can show everything the component shows: charts, slicers, plain tables, plain text, images, dividers, plain cards | The native visual (table below) |
 | **Native over a card picture** | As above, but the card surface uses a gradient, backdrop photo, dot texture or glow, which Power BI cannot apply to a visual container | A PNG of the card surface (drawn in the browser, `visualCapture.tsx`) in an image visual directly behind the native visual, which becomes transparent |
-| **HTML** | No built-in equivalent: stat cards with trend lines, change indicators, icons, supporting figures or illustrations; ring, activity-ring and progress gauges; tables with pills, icons, avatars, photos or two-line cells; hero text with overline, highlights or backdrop; donuts with a centre total or rich legend | The certified AppSource visual **HTML Content Secure** (`htmlContent443BE3AD55E043BF878BED274D3A6865`) bound to a measure that returns the component's HTML |
+| **HTML** | No built-in equivalent (see "Native first" below for what moved to native on 2026-11-11): stat cards with trend lines, supporting figures or illustrations; activity-ring and progress gauges; tables with pills, icons, avatars, photos or two-line cells; hero text with overline, highlights or backdrop; donuts with a centre total or rich legend | The certified AppSource visual **HTML Content Secure** (`htmlContent443BE3AD55E043BF878BED274D3A6865`) bound to a measure that returns the component's HTML |
 
 **HTML capture.**
 - On export, each HTML-routed component is rendered off-screen by the studio's own renderer and serialized by `inlineHtml.ts`:
@@ -75,7 +75,25 @@ Goal (user request): the exported report looks the same as the design in the por
 
 **Handoff spec.** Each visual's `powerBiVisual.rendering` records the route and the features behind it.
 
-**Not yet verified in Power BI Desktop.** The PBIR files validate against Microsoft's schemas, and the captured HTML is checked in a browser. Rendering inside the HTML Content Secure visual (its sanitizer, its CSS support) needs a check in Power BI Desktop.
+**Verified in Power BI Desktop** (seen in the user's screen recording for the LinkedIn video): the Fitness Overview export renders through HTML Content Secure as in the portal.
+
+## Native first: stacked native visuals (2026-11-11)
+
+User rule (HR Pulse Overview request): "by default, all visuals and details should be built using Power BI native visuals; if not possible, use the HTML viewer." Several design visuals that used to go to HTML are now **several built-in visuals stacked** (`composites.ts`). Each part is annotated `BIDesignStudio.role`.
+
+| Design | Native parts |
+| --- | --- |
+| KPI card with a change | **Main card:** `card` when centred (value over its label), `multiRowCard` when left-aligned, with no accent bar or outline. **Change card (`kpi-change`):** a small `card` bound to "… Change %", whose format string is `+0.0%;−0.0%;±0.0%`. Its font colour is bound to the measure "… Change Colour", which returns the theme's favourable, unfavourable or neutral colour and follows the KPI's polarity, so it stays correct on real data. The change card sits on the right of the value row, or under the label for the "below" trend style. |
+| KPI icon | A PNG picture of the icon (`kpi-icon`), drawn in the browser: the glowing round badge above the value ("top" style), or the small muted corner icon. With the badge, the card's padding keeps the value clear of it. |
+| Ring gauge, value inside | A `donutChart` over a two-row table "… Ring" (Achieved / Remaining, sorted), with the primary colour and the track colour, no legend or labels, inner radius 84 %. A `card` (`ring-centre`) sits in the centre with the value and the label (word wrap on). |
+| Text with a lead paragraph | One `textbox`: the text, then the lead as a smaller, muted paragraph. |
+| Own text colour (`style.textColor`) | Textbox runs, card value and label colours, chart title and subtitle `fontColor`, and axis and legend `labelColor`. Secondary text is the text colour mixed 66 % towards black (light text) or white (dark text), matching `color-mix()` in the design. |
+| Translucent card fill or border (rgba) | Treated like a gradient: a picture of the card surface behind the transparent native visual. Without a browser, the container colour carries the alpha as `transparency`. |
+| Page background picture (`canvas.backgroundImage`) | The page's `background.image` (registered image, scaling `Fit`; the page has the design's aspect ratio). Use it for shapes drawn for the layout, such as a hero band. |
+
+Still HTML: KPI trend lines, targets, supporting figures, illustrations, overlines, raised currency symbols, durations; a change with a caption under it, or an absolute change; the round icon badge *beside* the value; ring gauges with the percentage inside and figures beside them; activity rings; progress bars; table **card, tile and chip layouts**; tables with pills, icons, avatars, photos, progress bars or two-line cells.
+
+**Not yet verified in Power BI Desktop:** the stacked parts (multi-row card formatting, measure-bound font colour, donut slice colours and the page background picture). The files validate against Microsoft's schemas.
 
 ## How the design maps to Power BI
 

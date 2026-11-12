@@ -13,6 +13,7 @@ import { VisualRenderer } from '@/components/visuals/VisualRenderer';
 import { pixelRect, positionParamsFor } from '@/components/dashboard/pageGeometry';
 import { toast } from '@/components/common/toastStore';
 import { resolveTheme, themeToCssVars } from '@/services/themeService';
+import { pageBackgroundImageStyle } from '@/components/dashboard/pageBackground';
 import { previewPlacement, pageMaxRows } from '@/state/documentOps';
 import { selectActivePage, useEditorStore } from '@/state/editorStore';
 import { componentDisplayName } from './componentName';
@@ -200,6 +201,7 @@ export function EditorCanvas({ zoom }: { zoom: Zoom }) {
 
   const pageStyle = {
     ...themeToCssVars(theme.tokens, canvas.background),
+    ...pageBackgroundImageStyle(canvas),
     width: canvas.width,
     height: canvas.height,
     transform: `scale(${scale})`,

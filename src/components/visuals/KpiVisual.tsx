@@ -106,16 +106,26 @@ export function KpiVisual({ component }: { component: KpiComponent }) {
     </div>
   );
 
+  const labelBelow = config.labelPosition === 'below';
+  const labelRow = (
+    <div className={styles.labelRow}>
+      <div className={styles.label} title={label} data-strong={overline ? true : undefined}>
+        {label}
+      </div>
+      {Icon && config.iconStyle !== 'badge' && config.iconStyle !== 'top' && <Icon className={styles.icon} size={17} strokeWidth={1.75} aria-hidden="true" />}
+    </div>
+  );
   const main = (
     <>
       {overline && <div className={styles.overline}>{overline}</div>}
-      <div className={styles.labelRow}>
-        <div className={styles.label} title={label} data-strong={overline ? true : undefined}>
-          {label}
-        </div>
-        {Icon && !badge && <Icon className={styles.icon} size={17} strokeWidth={1.75} aria-hidden="true" />}
-      </div>
+      {config.iconStyle === 'top' && Icon && (
+        <span className={styles.topBadge} aria-hidden="true">
+          <Icon size={15} strokeWidth={2} />
+        </span>
+      )}
+      {!labelBelow && labelRow}
       {valueRow}
+      {labelBelow && labelRow}
       {showTrend && !inline && (
         <div className={styles.trendRow}>
           <span className={styles.trend} data-tone={tone}>

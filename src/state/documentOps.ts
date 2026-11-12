@@ -260,6 +260,13 @@ export function renameDocument(doc: DashboardDocument, name: string): OpResult<D
   return ok(trimmed === doc.name ? doc : { ...doc, name: trimmed });
 }
 
+/** Set or remove (undefined) the picture stretched behind every page. */
+export function setCanvasBackgroundImage(doc: DashboardDocument, src: string | undefined): OpResult<DashboardDocument> {
+  if (src === doc.canvas.backgroundImage) return ok(doc);
+  const { backgroundImage: _removed, ...rest } = doc.canvas;
+  return ok({ ...doc, canvas: src ? { ...rest, backgroundImage: src } : rest });
+}
+
 /** Change the page size. Refused if any visual would fall outside the new page. */
 export function setCanvasSize(doc: DashboardDocument, size: { width: number; height: number }): OpResult<DashboardDocument> {
   if (size.width === doc.canvas.width && size.height === doc.canvas.height) return ok(doc);

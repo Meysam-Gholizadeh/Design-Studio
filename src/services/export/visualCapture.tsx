@@ -14,13 +14,16 @@ import { DashboardRenderProvider } from '@/components/visuals/DashboardRenderCon
 import { VisualRenderer } from '@/components/visuals/VisualRenderer';
 import type { DashboardDocument } from '@/domain/schemas/document';
 import type { ThemeTokens } from '@/domain/schemas/theme';
-import type { DashboardComponent } from '@/domain/schemas/visuals';
+import { DESIGN_ICONS } from '@/components/visuals/designIcons';
+import type { IconName } from '@/domain/schemas/icons';
+import type { DashboardComponent, KpiComponent } from '@/domain/schemas/visuals';
 import { resolveTheme, themeToCssVars } from '../themeService';
 import { POWER_BI_PAGE_WIDTH } from './handoffSpec';
 import { toInlineHtml } from './inlineHtml';
+import { KPI_PARTS } from './pbip/composites';
 import { cardBackgroundNeeds, exportRoute } from './pbip/fidelity';
 import type { PbipAssets } from './pbip/pbipProject';
-import { CARD_GLOW_MARGIN } from './pbip/visualContainer';
+import { CARD_GLOW_MARGIN, mutedColorOf } from './pbip/visualContainer';
 
 const nextFrame = () =>
   new Promise<void>((resolve) => {
@@ -232,6 +235,60 @@ export async function drawCardBackground(c: DashboardComponent, tokens: ThemeTok
   return canvas.toDataURL('image/png');
 }
 
+/** Markup of a design icon as a standalone SVG in the given colour. */
+function iconSvg(name: IconName, size: number, strokeWidth: number, color: string): string {
+  const Icon = DESIGN_ICONS[name];
+  const host = document.createElement('div');
+  const root = createRoot(host);
+  flushSync(() => root.render(<Icon size={size} strokeWidth={strokeWidth} />));
+  let svg = host.innerHTML;
+  root.unmount();
+  if (!/xmlns=/.test(svg)) svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+  return svg.replace(/currentColor/g, color);
+}
+
+/**
+ * Draws a KPI icon as KpiVisual shows it: the round glowing badge above the
+ * value ("top" style) or the small muted icon by the label. PNG data URL, 4×.
+ */
+export async function drawKpiIcon(c: KpiComponent, tokens: ThemeTokens): Promise<string | undefined> {
+  if (!c.config.icon) return undefined;
+  const k = 4;
+  const top = c.config.iconStyle === 'top';
+  const { badge, badgeGlow, cornerIcon } = KPI_PARTS;
+  const size = top ? badge + 2 * badgeGlow : cornerIcon;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size * k;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas is not available.');
+  ctx.scale(k, k);
+  const iconSize = top ? 15 : cornerIcon;
+  const color = top ? tokens.primary : mutedColorOf(c, tokens);
+  if (top) {
+    const mid = size / 2;
+    const r = badge / 2;
+    ctx.save();
+    ctx.shadowColor = withAlpha(tokens.primary, 0.55);
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.arc(mid, mid, r, 0, Math.PI * 2);
+    ctx.fillStyle = withAlpha(tokens.primary, 0.14);
+    ctx.fill();
+    ctx.restore();
+    ctx.beginPath();
+    ctx.arc(mid, mid, r - 0.5, 0, Math.PI * 2);
+    ctx.strokeStyle = withAlpha(tokens.primary, 0.45);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  } else {
+    ctx.globalAlpha = 0.9;
+  }
+  const img = await loadImage(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(iconSvg(c.config.icon, iconSize * k, top ? 2 : 1.75, color))}`);
+  const offset = (size - iconSize) / 2;
+  ctx.drawImage(img, offset, offset, iconSize, iconSize);
+  return canvas.toDataURL('image/png');
+}
+
 /**
  * Captures everything the Power BI project needs that only a browser can
  * produce. Never throws: anything that cannot be captured falls back to the
@@ -242,17 +299,29 @@ export async function captureForPbip(doc: DashboardDocument): Promise<PbipAssets
   const tokens = resolveTheme(doc.themeId, doc.themeOverrides).tokens;
   const htmlIds = new Set<string>();
   const backgrounds = new Map<string, string>();
+  const kpiIcons = new Map<string, string>();
   for (const page of doc.pages) {
     const params = positionParamsFor(doc.canvas, page.grid);
     for (const c of page.components) {
       const route = exportRoute(c);
-      if (route.kind === 'html') htmlIds.add(c.id);
-      else if (cardBackgroundNeeds(c).length) {
+      if (route.kind === 'html') {
+        htmlIds.add(c.id);
+        continue;
+      }
+      if (cardBackgroundNeeds(c).length) {
         const r = pixelRect(params, c.layout);
         try {
           backgrounds.set(c.id, await drawCardBackground(c, tokens, { width: Math.round(r.width), height: Math.round(r.height) }));
         } catch {
           // Falls back to the plain native container.
+        }
+      }
+      if (c.type === 'kpi' && c.config.icon) {
+        try {
+          const icon = await drawKpiIcon(c, tokens);
+          if (icon) kpiIcons.set(c.id, icon);
+        } catch {
+          // The card is exported without its icon.
         }
       }
     }
@@ -263,5 +332,5 @@ export async function captureForPbip(doc: DashboardDocument): Promise<PbipAssets
   } catch {
     // Falls back to native visuals.
   }
-  return { html, cardBackgrounds: backgrounds };
+  return { html, cardBackgrounds: backgrounds, kpiIcons };
 }

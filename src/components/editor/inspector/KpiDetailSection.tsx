@@ -46,6 +46,7 @@ export function KpiDetailSection({ component: c, update }: SectionProps<Kpi>) {
           options={[
             { value: 'corner', label: 'Small, top-right corner' },
             { value: 'badge', label: 'Round badge before the value' },
+            { value: 'top', label: 'Glowing badge above the value' },
           ]}
           onChange={(v) =>
             edit((d) => {
@@ -55,6 +56,20 @@ export function KpiDetailSection({ component: c, update }: SectionProps<Kpi>) {
           }
         />
       )}
+      <SelectField
+        label="Label position"
+        value={c.config.labelPosition ?? 'above'}
+        options={[
+          { value: 'above', label: 'Above the value' },
+          { value: 'below', label: 'Below the value' },
+        ]}
+        onChange={(v) =>
+          edit((d) => {
+            if (v === 'above') delete d.config.labelPosition;
+            else d.config.labelPosition = v;
+          }, 'label-position')
+        }
+      />
       <SelectField
         label="Change shown as"
         value={c.config.comparisonKind ?? 'percent'}

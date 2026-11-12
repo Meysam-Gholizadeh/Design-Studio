@@ -152,6 +152,24 @@
   width: 100%;
 }
 
+/* Small accent badge above the value ("top" icon placement). */
+.topBadge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  color: var(--ds-primary);
+  background: color-mix(in srgb, var(--ds-primary) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ds-primary) 45%, transparent);
+  box-shadow: 0 0 14px -2px color-mix(in srgb, var(--ds-primary) 55%, transparent);
+}
+
+.kpi[data-align='center'] .topBadge {
+  align-self: center;
+}
+
 /* Illustration on the right; the content keeps clear of it. */
 .kpi[data-illustrated] {
   position: relative;

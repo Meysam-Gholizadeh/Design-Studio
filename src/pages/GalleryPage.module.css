@@ -19,6 +19,12 @@
   color: var(--app-text-2);
 }
 
+.publishedError {
+  margin-top: var(--space-8);
+  font-size: 13px;
+  color: var(--app-text-3);
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));

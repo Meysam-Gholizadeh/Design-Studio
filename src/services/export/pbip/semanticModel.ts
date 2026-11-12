@@ -9,8 +9,10 @@
  */
 import type { NumberFormat } from '@/domain/schemas/primitives';
 import type { DashboardDocument } from '@/domain/schemas/document';
+import type { ThemeTokens } from '@/domain/schemas/theme';
 import type { DashboardComponent } from '@/domain/schemas/visuals';
 import { getVisualDefinition } from '@/domain/visualDefinitions';
+import { resolveTheme } from '../../themeService';
 import { formatSpec } from '../powerBiMapping';
 import { cleanModelName, dax, NameRegistry } from './names';
 
@@ -55,6 +57,15 @@ export interface VisualBinding {
   roles: Record<string, FieldRef[]>;
   /** Field to sort the visual by (ascending), to keep the design's category order. */
   sortBy?: FieldRef;
+  /** Fields of the extra native visuals stacked with this one (see `compositeParts`). */
+  parts?: {
+    /** KPI change (signed percent) and the measure returning its colour. */
+    change?: FieldRef;
+    changeColor?: FieldRef;
+    /** Ring gauge drawn as a donut: Part (Achieved / Remaining) and its value. */
+    ringPart?: FieldRef;
+    ringValue?: FieldRef;
+  };
 }
 
 export interface SemanticModel {
@@ -164,7 +175,7 @@ function tableBase(c: DashboardComponent, fallbackIndex: number): string {
   return cleanModelName(c.title || label, `${getVisualDefinition(c.type).label} ${fallbackIndex}`);
 }
 
-function addVisual(b: ModelBuilder, c: DashboardComponent, index: number): VisualBinding | undefined {
+function addVisual(b: ModelBuilder, c: DashboardComponent, index: number, tokens: ThemeTokens): VisualBinding | undefined {
   const base = tableBase(c, index);
   switch (c.type) {
     case 'bar':
@@ -209,12 +220,28 @@ function addVisual(b: ModelBuilder, c: DashboardComponent, index: number): Visua
       const value = b.column(t, 'Value', 'double', { hidden: true });
       const row: Cell[] = [c.data.value];
       const measure = b.measure(t, label, value, c.data.format);
+      const parts: NonNullable<VisualBinding['parts']> = {};
       if (c.data.comparison !== undefined) {
         const col = b.column(t, 'Change Value', 'double', { hidden: true });
         const versus = c.data.comparisonLabel ? ` (${c.data.comparisonLabel})` : ' versus the comparison period';
-        const favourable = c.config.trendPolarity === 'higherIsBetter' ? 'An increase is favourable.' : 'A decrease is favourable.';
-        b.measure(t, `${label} Change %`, col, { kind: 'percent', decimals: 1 }, `Percent change${versus}. ${favourable}`);
+        const higherIsBetter = c.config.trendPolarity === 'higherIsBetter';
+        const favourable = higherIsBetter ? 'An increase is favourable.' : 'A decrease is favourable.';
+        const change = b.measure(t, `${label} Change %`, col, { kind: 'percent', decimals: 1 }, `Percent change${versus}. ${favourable}`);
         row.push(c.data.comparison);
+        if (c.config.showTrend) {
+          // Shown by the change card next to the KPI: signed like the design ("+6.3%", "−2.0%"), coloured by a measure.
+          const m = t.measures.find((x) => x.name === change.name)!;
+          m.formatString = '+0.0%;−0.0%;±0.0%';
+          const good = tokens.positive;
+          const bad = tokens.negative;
+          parts.change = change;
+          parts.changeColor = b.rawMeasure(
+            t,
+            `${label} Change Colour`,
+            () => `VAR d = ${dax.measure(change.name)} RETURN IF(d > 0, "${higherIsBetter ? good : bad}", IF(d < 0, "${higherIsBetter ? bad : good}", "${tokens.mutedText}"))`,
+            { description: `Font colour of the "${label}" change: favourable, unfavourable or neutral. Used by the change card.` },
+          );
+        }
       }
       if (c.data.target !== undefined) {
         const col = b.column(t, 'Target Value', 'double', { hidden: true });
@@ -222,7 +249,7 @@ function addVisual(b: ModelBuilder, c: DashboardComponent, index: number): Visua
         row.push(c.data.target);
       }
       t.rows = [row];
-      return { roles: { Values: [measure] } };
+      return { roles: { Values: [measure] }, ...(Object.keys(parts).length ? { parts } : {}) };
     }
     case 'gauge': {
       // The gauge label is a caption ("of full-year budget"); the title names the measure.
@@ -237,7 +264,20 @@ function addVisual(b: ModelBuilder, c: DashboardComponent, index: number): Visua
       const measures = fields.map(([col, name, v]) => (v === undefined ? undefined : b.measure(t, name, b.column(t, col, 'double', { hidden: true }), c.data.format)));
       t.rows = [fields.filter(([, , v]) => v !== undefined).map(([, , v]) => v!)];
       const [y, min, max, target] = measures;
-      return { roles: { Y: [y!], MinValue: [min!], MaxValue: [max!], ...(target ? { TargetValue: [target] } : {}) } };
+      const roles = { Y: [y!], MinValue: [min!], MaxValue: [max!], ...(target ? { TargetValue: [target] } : {}) };
+      if (c.config.variant !== 'ring') return { roles };
+      // A ring is a donut of the achieved and remaining parts, with a card showing the value in its centre.
+      const ring = b.table(`${label} Ring`, `Achieved and remaining parts of the "${label}" ring (drawn as a donut).`);
+      const order = b.column(ring, 'Sort Order', 'int64', { hidden: true, formatString: '0' });
+      const ringPart = b.column(ring, 'Part', 'string', { sortByColumn: order.name });
+      const ringValue = b.measure(ring, `${label} Ring Value`, b.column(ring, 'Value', 'double', { hidden: true }), c.data.format);
+      const span = c.data.max - c.data.min;
+      const achieved = Math.min(Math.max(c.data.value - c.data.min, 0), span);
+      ring.rows = [
+        [1, 'Achieved', achieved],
+        [2, 'Remaining', span - achieved],
+      ];
+      return { roles, parts: { ringPart, ringValue } };
     }
     case 'table': {
       const t = b.table(base, `Rows for the "${c.title ?? base}" table.`);
@@ -287,12 +327,13 @@ function addVisual(b: ModelBuilder, c: DashboardComponent, index: number): Visua
  */
 export function buildSemanticModel(doc: DashboardDocument, html: ReadonlyMap<string, string> = new Map()): SemanticModel {
   const b = new ModelBuilder(dataNote(doc));
+  const tokens = resolveTheme(doc.themeId, doc.themeOverrides).tokens;
   const bindings = new Map<string, VisualBinding>();
   let index = 0;
   for (const page of doc.pages) {
     for (const c of page.components) {
       index++;
-      const binding = addVisual(b, c, index);
+      const binding = addVisual(b, c, index, tokens);
       if (binding) bindings.set(c.id, binding);
     }
   }

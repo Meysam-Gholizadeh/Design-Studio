@@ -593,6 +593,76 @@ Concise progress log, per `CLAUDE.md`. Only verified work is marked done.
   - "How it works" uses light text and glowing step badges.
   - Lint and build are clean; the home, gallery and navigation E2E tests pass (25 of 25).
 
+## HR Pulse Overview and native-first PBIP export (2026-11-11, user request with a reference image)
+
+Request: add an HR dashboard to the gallery "like the image attached"; all details matter. By default every visual and detail must be built with **native Power BI visuals**, and only where impossible with the HTML viewer.
+
+- **Template:** `hr/hrPulseOverview.ts` (HR category, featured), with the new theme **Fresh Mint**.
+  - **Dark-green hero band:**
+    - greeting "Good morning, Sarah";
+    - three glass headcount tiles (128 / 110 / 5 with signed change);
+    - the 74 % "Overall Workforce Efficiency" ring with six icon metrics around it;
+    - the Team Stability Index area chart.
+  - **White cards:**
+    - Employee Risk Score as patterned score tiles;
+    - Onboarding as person cards with photos and hatched progress bars;
+    - HR Alerts with icon badges and pill counts;
+    - the AI HR Assistant with an orb, title, lead and suggestion chips.
+  - **Fictional people and figures.**
+- **Decision: page background picture.** The hero band, its glows, the concentric rings, the dotted connectors and the assistant's white panel sit *behind* several visuals. Overlapping visuals are not allowed, so they are drawn into one page background picture on the template's grid by `scripts/prepare-hr-assets.mjs`. The same script makes the orb and the avatar crops (Pexels, credited in `docs/IMAGE_CREDITS.md`). It is exported as the Power BI page background.
+- **New optional design features**, all validated and editable in the properties panel:
+  - `canvas.backgroundImage`: page background picture, under Page;
+  - `style.textColor`: card text colour, under Card style. Charts, KPIs, gauges and tables follow it through a card-level theme override;
+  - KPI `iconStyle: 'top'` (glowing badge above the value) and `labelPosition: 'below'`, under Card details;
+  - table `layout: 'cards' | 'tiles' | 'chips'`, under Display;
+  - column `display: 'progress'` with `max`. Like the other column display types, this is set in the design JSON and not in the inspector yet.
+- **Native-first PBIP export** (`fidelity.ts`, new `composites.ts`; details in `docs/PBIP_EXPORT.md`):
+  - **KPI with a change:** native card (`multiRowCard` when left-aligned) plus a change card. The change card's font colour is bound to a new "… Change Colour" measure, which respects polarity.
+  - **KPI icon:** a PNG picture drawn in the browser.
+  - **Ring gauge (value inside):** native donut over an Achieved / Remaining table, plus a centre card.
+  - **Lead paragraphs:** a second paragraph in the native textbox.
+  - **Text colours:** carried to textboxes, cards and chart titles and axes.
+  - **Translucent card fills:** a picture of the card surface.
+  - **Page background picture:** the Power BI page background image.
+  - **HR Pulse result:** 4 of 19 components use HTML (risk tiles, onboarding cards, alert list, chips). Everything else is native: 32 visual containers in total.
+- **Renderer:** in the editor and previews, a ring with the value inside now uses the full card width (it was capped at 60 % for a side label), and its label wraps inside the ring. Card layouts stretch their rows to fill the card.
+- **Tests:**
+  - 16 new unit tests (`pbipNative.test.ts`): colour helpers, routing per HR component, page picture, KPI tile parts and positions, signed format and colour measures by polarity, icon pictures, donut ring data and colours, text colours and lead paragraph.
+  - Also a page-background operation test, a new E2E export test of HR Pulse in the browser, and the gallery list and theme list.
+  - The PBIP structure test counts main visuals (stacked parts carry a role annotation).
+- **Verification:**
+  - 470 unit tests pass; lint and build are clean.
+  - All 56 E2E tests pass (the two theme-count checks were updated to 11).
+  - The KPI icon picture was inspected after a real export.
+- **Not yet verified in Power BI Desktop:** the stacked native parts and the page background picture. They validate against Microsoft's PBIR schemas.
+
+## Admin page: publish .pbix and .pbiviz files to the gallery (2026-11-12, scope change requested by the user)
+
+Request: an admin panel to upload a Power BI dashboard (.pbix) and a custom visual (.pbiviz) to the portal's gallery. The user chose:
+- **Storage: files in the repository.** No server.
+- **Protection: Cloudflare Access.**
+
+Details are in `docs/PUBLISHING.md`.
+
+- **`/admin` page.** It is not in the navigation.
+  - **Connect:** connect to GitHub (repository and branch default to this repo) with the owner's fine-grained token. Write access is checked.
+  - **Publish:** choose a file (checked in the browser: zip structure; the visual GUID and details come from package.json), add a preview picture, title, category and tags, then publish.
+  - **List and remove:** see what is published on the branch and remove items (with confirmation).
+- **Publishing is one commit** through the Git Data API. It adds the file, the preview and `public/published/manifest.json` (Zod-validated). It does not force, so a branch that moved meanwhile gives a clear "try again". Cloudflare's redeploy publishes it.
+- **Gallery:** a "Power BI files" section below the templates. It loads the manifest at runtime, uses the same search and category filter, and gives each card a preview (or an icon), a kind badge, size or version, and a download link. It is labelled as content from the publisher's file, not studio sample data. A missing manifest means the section is hidden.
+- **Limits:** 25 MB per file (Cloudflare's static file limit), and 2 MB for a PNG, JPEG or WebP preview.
+- **Tests:**
+  - 17 unit tests (`tests/unit/services/published.test.ts`).
+  - 2 E2E tests (`admin-publish.spec.ts`): the admin flow against a fake GitHub API, including rejecting an invalid file, publishing and removing; and the gallery section with download links and filters.
+- **Not yet verified:** a real publish to GitHub, the Cloudflare redeploy, and the Cloudflare Access setup.
+- **Download switch for custom visuals** (same day, user request):
+  - **Where:** set when publishing, or later from the switch on the item's row in the published list.
+  - **Download off** keeps the file in `gallery-held/` instead of `public/`, so it is truly not served, rather than only hiding the button. Switching moves the same blob in one commit, with no re-upload.
+  - **Gallery:** the card shows "download is not offered".
+  - **Older lists:** the `downloadable` field defaults to true.
+  - **Tests:** 3 more unit tests (move off/on, removal from the held folder, missing file, paths, default for old lists) and 1 more E2E test (publish with downloads off, then switch them on).
+  - **Caveat:** in a public GitHub repository, held files are still visible on GitHub.
+
 ## Fitness Overview (2026-11-06, user request with a reference screenshot)
 - **Request:** build the reference's fitness dashboard keeping all details, and find similar images on the web.
 - **Approach:**

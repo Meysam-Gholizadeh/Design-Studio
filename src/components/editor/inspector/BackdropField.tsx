@@ -7,10 +7,18 @@ import styles from './Inspector.module.css';
 interface BackdropFieldProps {
   value: string | undefined;
   onChange: (src: string | undefined) => void;
+  /** What the picture is, for the buttons and file input ("backdrop photo"). */
+  noun?: string;
+  hint?: string;
 }
 
-/** Upload / replace / remove the card's decorative backdrop photo. */
-export function BackdropField({ value, onChange }: BackdropFieldProps) {
+/** Upload / replace / remove a decorative picture (by default the card's backdrop photo). */
+export function BackdropField({
+  value,
+  onChange,
+  noun = 'backdrop photo',
+  hint = 'Decorative photo on the right of the card, fading into it behind the content.',
+}: BackdropFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   return (
@@ -18,7 +26,7 @@ export function BackdropField({ value, onChange }: BackdropFieldProps) {
       <div className={styles.imagePreview}>
         {value && <img src={value} alt="" />}
         <Button size="sm" variant="secondary" icon={<ImagePlus size={15} aria-hidden="true" />} onClick={() => inputRef.current?.click()}>
-          {value ? 'Replace backdrop photo' : 'Add backdrop photo'}
+          {value ? `Replace ${noun}` : `Add ${noun}`}
         </Button>
         {value && (
           <Button size="sm" variant="ghost" icon={<Trash2 size={15} aria-hidden="true" />} onClick={() => onChange(undefined)}>
@@ -30,7 +38,7 @@ export function BackdropField({ value, onChange }: BackdropFieldProps) {
           type="file"
           accept="image/png,image/jpeg,image/webp"
           className={styles.fileInput}
-          aria-label="Backdrop photo file"
+          aria-label={`${noun.charAt(0).toUpperCase()}${noun.slice(1)} file`}
           tabIndex={-1}
           onChange={async (e) => {
             const file = e.target.files?.[0];
@@ -48,7 +56,7 @@ export function BackdropField({ value, onChange }: BackdropFieldProps) {
           {error}
         </p>
       )}
-      <p className={styles.hint}>Decorative photo on the right of the card, fading into it behind the content.</p>
+      <p className={styles.hint}>{hint}</p>
     </>
   );
 }

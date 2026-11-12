@@ -4,6 +4,7 @@ import { isIconName } from '@/domain/schemas/icons';
 import type { TableColumn, TableComponent } from '@/domain/schemas/visuals';
 import { DESIGN_ICONS } from './designIcons';
 import { pillTone } from './pillTone';
+import { CardsLayout, ChipsLayout, ProgressCell, TilesLayout } from './TableLayouts';
 import styles from './TableVisual.module.css';
 
 type Cell = string | number | null | undefined;
@@ -30,6 +31,7 @@ function CellContent({ row, column, images }: { row: Row; column: TableColumn; i
   const value = row[column.key];
   const text = renderCell(value, column);
 
+  if (column.display === 'progress') return <ProgressCell value={value} column={column} showLabel={false} />;
   if (column.display === 'pill' && value !== null && value !== undefined && value !== '') {
     return (
       <span className={styles.pill} data-tone={pillTone(String(value))}>
@@ -84,6 +86,9 @@ function CellContent({ row, column, images }: { row: Row; column: TableColumn; i
 export function TableVisual({ component }: { component: TableComponent }) {
   const { columns, rows } = component.data;
   const cfg = component.config;
+  if (cfg.layout === 'cards') return <CardsLayout component={component} />;
+  if (cfg.layout === 'tiles') return <TilesLayout component={component} />;
+  if (cfg.layout === 'chips') return <ChipsLayout component={component} />;
 
   const totals = cfg.showTotals
     ? columns.map((col, i) => {

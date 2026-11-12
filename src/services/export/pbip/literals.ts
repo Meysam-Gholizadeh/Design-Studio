@@ -34,6 +34,16 @@ export function formatNumber(n: number): string {
   return String(rounded);
 }
 
+/** Opacity (0–1) of a colour in the notations `toHex` accepts; 1 when it has no alpha. */
+export function alphaOf(color: string): number {
+  const c = color.trim();
+  const rgba = /^rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)(%?)\s*\)$/i.exec(c);
+  if (rgba) return Math.min(1, Math.max(0, Number.parseFloat(rgba[1]!) / (rgba[2] ? 100 : 1)));
+  const hex = /^#([0-9a-f]{4}|[0-9a-f]{8})$/i.exec(c)?.[1];
+  if (hex) return Number.parseInt(hex.length === 4 ? hex[3]!.repeat(2) : hex.slice(6), 16) / 255;
+  return 1;
+}
+
 /**
  * Converts the colour notations allowed in designs (#rgb, #rgba, #rrggbb,
  * #rrggbbaa, rgb(), rgba()) to #RRGGBB, which is what Power BI expects.

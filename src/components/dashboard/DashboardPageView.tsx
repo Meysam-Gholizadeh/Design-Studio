@@ -4,6 +4,7 @@ import { resolveTheme, themeToCssVars } from '@/services/themeService';
 import { DashboardRenderProvider } from '@/components/visuals/DashboardRenderContext';
 import type { RenderMode } from '@/components/visuals/renderContext';
 import { VisualRenderer } from '@/components/visuals/VisualRenderer';
+import { pageBackgroundImageStyle } from './pageBackground';
 import { pixelRect, positionParamsFor } from './pageGeometry';
 import styles from './DashboardPageView.module.css';
 
@@ -32,6 +33,7 @@ export function DashboardPageView({ document, pageIndex = 0, mode, themeId }: Da
 
   const rootStyle = {
     ...themeToCssVars(theme.tokens, document.canvas.background),
+    ...pageBackgroundImageStyle(document.canvas),
     width: document.canvas.width,
     height: document.canvas.height,
   } as CSSProperties;

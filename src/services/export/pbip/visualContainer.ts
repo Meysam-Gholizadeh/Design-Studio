@@ -7,7 +7,7 @@ import type { ThemeTokens } from '@/domain/schemas/theme';
 import type { DashboardComponent } from '@/domain/schemas/visuals';
 import type { HandoffVisual } from '../handoffSpec';
 import { HTML_CONTENT_VISUAL } from './fidelity';
-import { lit, objectEntry, toHex } from './literals';
+import { alphaOf, lit, objectEntry, toHex } from './literals';
 import type { FieldRef, VisualBinding } from './semanticModel';
 
 export const VISUAL_CONTAINER_SCHEMA = 'https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json';
@@ -32,6 +32,25 @@ export interface VisualContext {
   htmlMeasure?: FieldRef;
   /** Set when a picture of the card surface sits behind the (then transparent) native visual. */
   hasCardBackground?: boolean;
+  /** Extra inner padding (Power BI px) keeping the visual's content clear of stacked parts (icon badge, change card). */
+  contentInset?: { top?: number; bottom?: number };
+}
+
+/** Text colour of a component: its own (cards on a dark band) or the theme's. */
+export function textColorOf(c: DashboardComponent, tokens: ThemeTokens): string {
+  return c.style.textColor ?? tokens.text;
+}
+
+/** Secondary text colour: the theme's muted colour, or the component's text colour softened (as `color-mix(… 66%)` in the design). */
+export function mutedColorOf(c: DashboardComponent, tokens: ThemeTokens): string {
+  if (!c.style.textColor) return tokens.mutedText;
+  const hex = toHex(c.style.textColor);
+  const n = Number.parseInt(hex.slice(1), 16);
+  const rgb = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  const light = (0.2126 * rgb[0]! + 0.7152 * rgb[1]! + 0.0722 * rgb[2]!) / 255 > 0.5;
+  // Mixed towards the dark (or light) surface such text sits on.
+  const toward = light ? 0 : 255;
+  return `#${rgb.map((v) => Math.round(v * 0.66 + toward * 0.34).toString(16).padStart(2, '0')).join('')}`.toUpperCase();
 }
 
 /** Applied inside the HTML Content visual: no page margins or scrollbars, so the HTML fills the visual exactly. */
@@ -54,7 +73,7 @@ function projection(f: FieldRef, active?: boolean) {
   };
 }
 
-function query(binding: VisualBinding) {
+export function query(binding: VisualBinding) {
   const queryState: Record<string, { projections: ReturnType<typeof projection>[] }> = {};
   for (const [role, fields] of Object.entries(binding.roles)) {
     if (fields.length) queryState[role] = { projections: fields.map((f) => projection(f, role === 'Category')) };
@@ -75,16 +94,20 @@ const TEXT_STYLE = {
   caption: { fontSize: '9pt' },
 } as const;
 
-function chartObjects(c: DashboardComponent, binding: VisualBinding | undefined): Objects {
+function chartObjects(c: DashboardComponent, binding: VisualBinding | undefined, tokens: ThemeTokens): Objects {
   const o: Objects = {};
+  // Own text colour (charts on a dark band): axis and legend text follow it.
+  const ink = c.style.textColor ? { labelColor: lit.color(mutedColorOf(c, tokens)) } : {};
   if ('showLegend' in c.config) {
     o.legend = objectEntry({
       show: lit.bool(c.config.showLegend),
       position: lit.str(LEGEND_POSITION[c.config.legendPosition]),
+      ...ink,
     });
   }
   if ('showDataLabels' in c.config) o.labels = objectEntry({ show: lit.bool(c.config.showDataLabels) });
-  if ('showGridLines' in c.config) o.valueAxis = objectEntry({ gridlineShow: lit.bool(c.config.showGridLines) });
+  if ('showGridLines' in c.config) o.valueAxis = objectEntry({ gridlineShow: lit.bool(c.config.showGridLines), ...ink });
+  if (c.style.textColor && 'categories' in c.data) o.categoryAxis = objectEntry(ink);
 
   if (c.type === 'line' || c.type === 'area' || c.type === 'combo') {
     o.lineStyles = objectEntry({
@@ -146,25 +169,84 @@ function findSeriesMeasure(binding: VisualBinding, index: number, combo?: { kind
   return (kind === 'bar' ? binding.roles.Y : binding.roles.Y2)?.[sameKindBefore];
 }
 
-function cardObjects(c: Extract<DashboardComponent, { type: 'kpi' }>): Objects {
+/** Centred KPIs use the card visual (value over its label); left-aligned ones the multi-row card, which is left-aligned. */
+export function kpiVisualType(c: Extract<DashboardComponent, { type: 'kpi' }>): 'card' | 'multiRowCard' {
+  return c.config.align === 'left' ? 'multiRowCard' : 'card';
+}
+
+function cardObjects(c: Extract<DashboardComponent, { type: 'kpi' }>, tokens: ThemeTokens): Objects {
+  const valueColor = c.style.textColor ? { color: lit.color(textColorOf(c, tokens)) } : {};
+  const labelColor = c.style.textColor ? { color: lit.color(mutedColorOf(c, tokens)) } : {};
+  if (kpiVisualType(c) === 'multiRowCard') {
+    return {
+      dataLabels: objectEntry({ fontSize: lit.num(VALUE_SIZE[c.config.valueSize]), ...valueColor }),
+      categoryLabels: objectEntry({ show: lit.bool(true), fontSize: lit.num(9), ...labelColor }),
+      card: objectEntry({ barShow: lit.bool(false), outline: lit.str('None') }),
+    };
+  }
   return {
     labels: objectEntry({
       fontSize: lit.num(VALUE_SIZE[c.config.valueSize]),
       labelDisplayUnits: lit.num(c.data.format.compact ? 0 : 1),
+      ...valueColor,
     }),
-    categoryLabels: objectEntry({ show: lit.bool(true) }),
+    categoryLabels: objectEntry({ show: lit.bool(true), ...labelColor }),
+    wordWrap: objectEntry({ show: lit.bool(true) }),
   };
 }
 
-function textParagraphs(text: string, variant: keyof typeof TEXT_STYLE, align: 'left' | 'center' | 'right', color: string) {
+type TextVariant = keyof typeof TEXT_STYLE;
+
+function textParagraphs(text: string, variant: TextVariant, align: 'left' | 'center' | 'right', color: string) {
   return text.split(/\r?\n/).map((line) => ({
     textRuns: [{ value: line, textStyle: { ...TEXT_STYLE[variant], color: toHex(color) } }],
     ...(align !== 'left' ? { horizontalTextAlignment: align } : {}),
   }));
 }
 
+/** Text block: the main text, then its lead paragraph (smaller, muted), like the design. */
+function textBlock(c: Extract<DashboardComponent, { type: 'text' }>, tokens: ThemeTokens) {
+  const own = c.style.textColor;
+  const color =
+    c.config.emphasis === 'muted' ? mutedColorOf(c, tokens) : c.config.emphasis === 'primary' ? tokens.primary : own ?? tokens.text;
+  const paragraphs = textParagraphs(c.data.text, c.config.variant, c.config.align, color);
+  if (!c.data.lead) return paragraphs;
+  const leadVariant: TextVariant = c.config.variant === 'caption' ? 'caption' : 'body';
+  return [...paragraphs, ...textParagraphs(c.data.lead, leadVariant, c.config.align, mutedColorOf(c, tokens))];
+}
+
+/** Ring gauge as a donut: achieved part in the primary colour, the rest as the track. */
+function ringObjects(binding: VisualBinding | undefined, tokens: ThemeTokens): Objects {
+  const part = binding?.parts?.ringPart;
+  const fill = (label: string, color: string) =>
+    part
+      ? objectEntry(
+          { fill: lit.color(color) },
+          {
+            data: [
+              {
+                scopeId: {
+                  Comparison: {
+                    ComparisonKind: 0,
+                    Left: { Column: { Expression: { SourceRef: { Entity: part.table } }, Property: part.name } },
+                    Right: { Literal: { Value: `'${label}'` } },
+                  },
+                },
+              },
+            ],
+          },
+        )
+      : [];
+  return {
+    legend: objectEntry({ show: lit.bool(false) }),
+    labels: objectEntry({ show: lit.bool(false) }),
+    slices: objectEntry({ innerRadiusRatio: lit.num(84) }),
+    dataPoint: [...fill('Achieved', tokens.primary), ...fill('Remaining', tokens.surfaceAlt)],
+  };
+}
+
 /** HTML visuals carry their whole card (surface, border, title) in the HTML: the container is bare. */
-function bareContainerObjects(): Objects {
+export function bareContainerObjects(): Objects {
   return {
     title: objectEntry({ show: lit.bool(false) }),
     background: objectEntry({ show: lit.bool(false) }),
@@ -175,35 +257,46 @@ function bareContainerObjects(): Objects {
   };
 }
 
-function containerObjects(c: DashboardComponent, showTitle: boolean, hasCardBackground = false): Objects {
+function titleObjects(c: DashboardComponent, showTitle: boolean, tokens: ThemeTokens): Objects {
   const o: Objects = {};
-  if (hasCardBackground) {
-    // The card surface is the picture behind this visual: keep only the title.
-    const bare = bareContainerObjects();
-    return {
-      title: objectEntry({
-        show: lit.bool(showTitle && Boolean(c.title)),
-        ...(showTitle && c.title ? { text: lit.str(c.title) } : {}),
-        ...(c.style.titleAlign ? { alignment: lit.str(c.style.titleAlign) } : {}),
-        ...(c.style.titleSize ? { fontSize: lit.num(TITLE_SIZE[c.style.titleSize]) } : {}),
-      }),
-      ...(showTitle && c.subtitle ? { subTitle: objectEntry({ show: lit.bool(true), text: lit.str(c.subtitle) }) } : {}),
-      background: bare.background!,
-      border: bare.border!,
-      dropShadow: bare.dropShadow!,
-    };
-  }
   o.title = objectEntry({
     show: lit.bool(showTitle && Boolean(c.title)),
     ...(showTitle && c.title ? { text: lit.str(c.title) } : {}),
     ...(c.style.titleAlign ? { alignment: lit.str(c.style.titleAlign) } : {}),
     ...(c.style.titleSize ? { fontSize: lit.num(TITLE_SIZE[c.style.titleSize]) } : {}),
+    ...(c.style.textColor ? { fontColor: lit.color(textColorOf(c, tokens)) } : {}),
   });
-  if (showTitle && c.subtitle) o.subTitle = objectEntry({ show: lit.bool(true), text: lit.str(c.subtitle) });
+  if (showTitle && c.subtitle) {
+    o.subTitle = objectEntry({
+      show: lit.bool(true),
+      text: lit.str(c.subtitle),
+      ...(c.style.textColor ? { fontColor: lit.color(mutedColorOf(c, tokens)) } : {}),
+    });
+  }
+  return o;
+}
+
+function containerObjects(c: DashboardComponent, showTitle: boolean, tokens: ThemeTokens, hasCardBackground = false, inset?: VisualContext['contentInset']): Objects {
+  const padding: Objects =
+    inset && (inset.top || inset.bottom)
+      ? { padding: objectEntry({ ...(inset.top ? { top: lit.num(inset.top) } : {}), ...(inset.bottom ? { bottom: lit.num(inset.bottom) } : {}) }) }
+      : {};
+  if (hasCardBackground) {
+    // The card surface is the picture behind this visual: keep only the title.
+    const bare = bareContainerObjects();
+    return {
+      ...titleObjects(c, showTitle, tokens),
+      background: bare.background!,
+      border: bare.border!,
+      dropShadow: bare.dropShadow!,
+      ...padding,
+    };
+  }
+  const o: Objects = { ...titleObjects(c, showTitle, tokens), ...padding };
   if (c.style.transparent) {
     o.background = objectEntry({ show: lit.bool(false) });
   } else if (c.style.background) {
-    o.background = objectEntry({ show: lit.bool(true), color: lit.color(c.style.background), transparency: lit.num(0) });
+    o.background = objectEntry({ show: lit.bool(true), color: lit.color(c.style.background), transparency: lit.num(Math.round((1 - alphaOf(c.style.background)) * 100)) });
   }
   if (c.style.showBorder !== undefined || c.style.borderColor || c.style.radius !== undefined) {
     o.border = objectEntry({
@@ -248,14 +341,8 @@ function visualConfig(ctx: VisualContext): VisualConfig | undefined {
     };
   }
   switch (c.type) {
-    case 'text': {
-      const color = c.config.emphasis === 'muted' ? tokens.mutedText : c.config.emphasis === 'primary' ? tokens.primary : tokens.text;
-      return {
-        visualType: 'textbox',
-        objects: { general: objectEntry({ paragraphs: textParagraphs(c.data.text, c.config.variant, c.config.align, color) }) },
-        showTitle: false,
-      };
-    }
+    case 'text':
+      return { visualType: 'textbox', objects: { general: objectEntry({ paragraphs: textBlock(c, tokens) }) }, showTitle: false };
     case 'image': {
       if (!c.data.src) {
         // No picture chosen in the design: keep the slot as a labelled placeholder.
@@ -297,9 +384,9 @@ function visualConfig(ctx: VisualContext): VisualConfig | undefined {
     case 'kpi':
       // The card's category label already shows the KPI name; only add a title when it says something else.
       return {
-        visualType: 'card',
+        visualType: kpiVisualType(c),
         query: binding && query(binding),
-        objects: cardObjects(c),
+        objects: cardObjects(c, tokens),
         showTitle: Boolean(c.title) && c.title!.trim().toLowerCase() !== c.config.label.trim().toLowerCase(),
       };
     case 'slicer':
@@ -323,10 +410,21 @@ function visualConfig(ctx: VisualContext): VisualConfig | undefined {
         },
         showTitle: true,
       };
-    case 'gauge':
+    case 'gauge': {
+      const ring = binding?.parts;
+      if (c.config.variant === 'ring' && ring?.ringPart && ring.ringValue) {
+        // The value and label are shown by a card stacked in the ring's centre (composites.ts).
+        return {
+          visualType: 'donutChart',
+          query: query({ roles: { Category: [ring.ringPart], Y: [ring.ringValue] }, sortBy: ring.ringPart }),
+          objects: ringObjects(binding, tokens),
+          showTitle: true,
+        };
+      }
       return { visualType: 'gauge', query: binding && query(binding), objects: {}, showTitle: true };
+    }
     default:
-      return { visualType: type, query: binding && query(binding), objects: chartObjects(c, binding), showTitle: true };
+      return { visualType: type, query: binding && query(binding), objects: chartObjects(c, binding, tokens), showTitle: true };
   }
 }
 
@@ -355,7 +453,9 @@ export function buildVisualContainer(ctx: VisualContext) {
       visualType: config.visualType,
       ...(config.query && Object.keys(config.query.queryState).length ? { query: config.query } : {}),
       ...(objects ? { objects } : {}),
-      visualContainerObjects: ctx.htmlMeasure ? bareContainerObjects() : containerObjects(ctx.component, config.showTitle, ctx.hasCardBackground),
+      visualContainerObjects: ctx.htmlMeasure
+        ? bareContainerObjects()
+        : containerObjects(ctx.component, config.showTitle, ctx.tokens, ctx.hasCardBackground, ctx.contentInset),
       drillFilterOtherVisuals: true,
     },
     ...(ctx.component.hidden ? { isHidden: true } : {}),

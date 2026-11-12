@@ -16,7 +16,8 @@ import { exportRoute, HTML_CONTENT_VISUAL } from './pbip/fidelity';
 function renderingOf(c: DashboardComponent): NonNullable<PowerBiVisualSuggestion['rendering']> {
   const route = exportRoute(c);
   if (route.kind === 'html') return { kind: 'html-content', visual: HTML_CONTENT_VISUAL.displayName, features: route.reasons };
-  return 'cardBackground' in route ? { kind: 'native-with-card-background', features: route.cardBackground } : { kind: 'native' };
+  const parts = route.parts ? { parts: route.parts } : {};
+  return route.cardBackground ? { kind: 'native-with-card-background', features: route.cardBackground, ...parts } : { kind: 'native', ...parts };
 }
 
 export const HANDOFF_FORMAT = 'bi-design-studio/powerbi-handoff';

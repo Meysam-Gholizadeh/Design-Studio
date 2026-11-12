@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { SampleDataNotice } from '@/components/common/SampleDataNotice';
 import { SearchInput } from '@/components/common/SearchInput';
 import { CategoryFilter } from '@/components/gallery/CategoryFilter';
+import { PublishedSection } from '@/components/gallery/PublishedSection';
 import { TemplateCard } from '@/components/gallery/TemplateCard';
 import { templateRepository } from '@/services/templateService';
 import page from './Page.module.css';
@@ -88,6 +89,8 @@ export function GalleryPage() {
           }
         />
       )}
+
+      <PublishedSection text={text} categoryId={categoryId} />
     </div>
   );
 }

@@ -20,6 +20,7 @@ export const router = createBrowserRouter([
       { path: 'editor', lazy: async () => ({ Component: (await import('@/pages/EditorLauncherPage')).EditorLauncherPage }) },
       { path: 'import', lazy: async () => ({ Component: (await import('@/pages/ImportHtmlPage')).ImportHtmlPage }) },
       { path: 'assistant', lazy: async () => ({ Component: (await import('@/pages/AssistantPage')).AssistantPage }) },
+      { path: 'admin', lazy: async () => ({ Component: (await import('@/pages/AdminPage')).AdminPage }) },
       { path: '*', lazy: async () => ({ Component: (await import('@/pages/NotFoundPage')).NotFoundPage }) },
     ],
   },

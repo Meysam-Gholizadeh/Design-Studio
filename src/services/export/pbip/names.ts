@@ -54,6 +54,7 @@ export function tmdlText(value: string): string {
 export const dax = {
   table: (name: string) => `'${name.replace(/'/g, "''")}'`,
   column: (table: string, column: string) => `${dax.table(table)}[${column.replace(/]/g, ']]')}]`,
+  measure: (name: string) => `[${name.replace(/]/g, ']]')}]`,
 };
 
 export const m = {

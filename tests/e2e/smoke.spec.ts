@@ -116,7 +116,7 @@ test('themes page applies a theme to the live preview without changing content',
   const errors = trackErrors(page);
   await page.goto('/themes');
   await expect(page.getByRole('heading', { name: 'Themes & Layouts' })).toBeVisible();
-  await expect(page.getByRole('radio')).toHaveCount(10);
+  await expect(page.getByRole('radio')).toHaveCount(11);
 
   const preview = page.locator('[role="tabpanel"] [role="group"]').first();
   await expect(preview).toHaveAttribute('data-theme-mode', 'light');

@@ -8,6 +8,7 @@ import { hospitalOperations } from './healthcare/hospitalOperations';
 import { patientExperience } from './healthcare/patientExperience';
 import { physioPatientRecovery } from './healthcare/physioPatientRecovery';
 import { physioRecoveryJourney } from './healthcare/physioRecoveryJourney';
+import { hrPulseOverview } from './hr/hrPulseOverview';
 import { hrWorkforceOverview } from './hr/hrWorkforceOverview';
 import { operationsPerformanceOverview } from './operations/operationsPerformanceOverview';
 import { procurementOverview } from './procurement/procurementOverview';
@@ -18,6 +19,7 @@ import { storefrontOverview } from './sales/storefrontOverview';
 export const TEMPLATE_DEFINITIONS: readonly TemplateDefinition[] = [
   financePerformanceOverview,
   personalFinanceHub,
+  hrPulseOverview,
   fitnessOverview,
   learningPlatformOverview,
   storefrontOverview,

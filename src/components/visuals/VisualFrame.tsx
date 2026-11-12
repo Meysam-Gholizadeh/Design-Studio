@@ -32,6 +32,10 @@ export function VisualFrame({ component, children }: VisualFrameProps) {
         ? `0 0 0 1px color-mix(in srgb, ${glowColor} 35%, transparent), 0 0 28px -6px color-mix(in srgb, ${glowColor} 55%, transparent)${shadow === 'none' ? '' : `, ${shadow}`}`
         : shadow,
     padding: s.padding !== undefined ? `${s.padding}px` : undefined,
+    // Card text colour: content reads --ds-text / --ds-muted; muted follows at lower opacity.
+    ...(s.textColor
+      ? ({ '--ds-text': s.textColor, '--ds-muted': `color-mix(in srgb, ${s.textColor} 66%, transparent)`, color: s.textColor } as CSSProperties)
+      : {}),
   };
   const showHeader = !HEADERLESS.has(component.type) && Boolean(component.title || component.subtitle);
   const titleSize = s.titleSize ?? 'md';

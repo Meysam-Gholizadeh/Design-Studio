@@ -86,6 +86,8 @@ export const componentStyleSchema = z.object({
   subtitlePlacement: z.enum(['below', 'above']).optional(),
   /** Decorative photo on the right of the card, fading into the card surface behind the content. */
   backdrop: imageSrcSchema.optional(),
+  /** Text colour for this card (e.g. white on a dark band); muted text follows it at lower opacity. */
+  textColor: colorSchema.optional(),
 });
 export type ComponentStyle = z.infer<typeof componentStyleSchema>;
 
@@ -221,7 +223,9 @@ export const kpiComponentSchema = z.object({
     /** How the change is shown: under the value with an arrow (default) or as compact text beside the value. */
     trendStyle: z.enum(['below', 'inline']).optional(),
     /** Where the icon sits: small in the top-right corner (default) or in a round accent badge before the value. */
-    iconStyle: z.enum(['corner', 'badge']).optional(),
+    iconStyle: z.enum(['corner', 'badge', 'top']).optional(),
+    /** Label above the value (default) or below it. */
+    labelPosition: z.enum(['above', 'below']).optional(),
     /** Sparkline drawing: a line (default), a rising bar ladder beside the value, or labelled columns with the peak highlighted. */
     sparklineStyle: z.enum(['line', 'bars', 'columns']).optional(),
     /** Change shown as a percentage (default) or as an absolute amount in the value's format (+$57.4K). */
@@ -315,7 +319,9 @@ const tableColumnSchema = z.object({
    * - `accent`: emphasised in the theme's primary colour (ranks such as "01");
    * - `rating`: a score with a filled star (4.3 ★).
    */
-  display: z.enum(['text', 'pill', 'signed', 'accent', 'rating']).optional(),
+  display: z.enum(['text', 'pill', 'signed', 'accent', 'rating', 'progress']).optional(),
+  /** Progress cells: the value that fills the bar (e.g. 10 tasks); shown as "7/10". */
+  max: finiteNumber.positive().optional(),
   /** Row field holding a person's name, shown as a round initials avatar before the cell. */
   avatarKey: z.string().max(40).optional(),
   /** Icon badge colouring: neutral (default) or outlined in the theme's primary colour. */
@@ -358,6 +364,12 @@ export const tableComponentSchema = z.object({
     highlightNegative: z.boolean(),
     /** Show a total row for numeric columns. */
     showTotals: z.boolean(),
+    /**
+     * How rows are laid out: a table (default); `cards` (one card per row: picture or icon, name and
+     * second line, then the other columns); `tiles` (one tile per row: big value over a patterned block
+     * in the row's palette colour, legend below); `chips` (rows as pill buttons with icons).
+     */
+    layout: z.enum(['table', 'cards', 'tiles', 'chips']).optional(),
   }),
 });
 

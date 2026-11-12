@@ -117,7 +117,9 @@ describe.each(documents)('PBIP project for %s', (_name, doc) => {
       expect(page.width).toBe(1280);
       const visuals = Object.keys(files).filter((p) => p.startsWith(`${folder}.Report/definition/pages/${name}/visuals/`));
       const drawable = doc.pages[i]!.components.filter((c) => !(c.type === 'divider' && c.config.lineStyle === 'none'));
-      expect(visuals).toHaveLength(drawable.length);
+      // Stacked native parts (change cards, ring centres, pictures) carry a role annotation; every component has one main visual.
+      const main = visuals.filter((v) => !JSON.parse(files[v] as string).annotations.some((a: { name: string }) => a.name === 'BIDesignStudio.role'));
+      expect(main).toHaveLength(drawable.length);
       for (const v of visuals) {
         const visual = JSON.parse(files[v] as string);
         expect(visual.position.x + visual.position.width).toBeLessThanOrEqual(page.width);
@@ -156,7 +158,8 @@ describe('PBIP details', () => {
 
   it('maps visual types, titles and measures from the design', () => {
     const types = visuals.map((v) => v.visual.visualType);
-    expect(types).toContain('card');
+    // Left-aligned KPIs use the (left-aligned) multi-row card, centred ones the card.
+    expect(types.some((t) => t === 'card' || t === 'multiRowCard')).toBe(true);
     expect(types).toContain('textbox');
     const titled = visuals.find((v) => v.visual.visualContainerObjects.title?.[0]?.properties?.text?.expr?.Literal?.Value === "'Revenue vs Budget'");
     expect(titled).toBeDefined();

@@ -247,6 +247,30 @@ export const THEMES: readonly ThemeDefinition[] = [
       spacingScale: 1.15,
     },
   },
+  {
+    id: 'fresh-mint',
+    name: 'Fresh Mint',
+    description: 'Soft sage page, white cards and a fresh lime-green accent; pairs with a dark-green hero band. Calm and modern, made for HR and people dashboards.',
+    mode: 'light',
+    tokens: {
+      pageBackground: '#EEF1EB',
+      surface: '#FFFFFF',
+      surfaceAlt: '#F3F6F1',
+      text: '#15211A',
+      mutedText: '#5F6B63',
+      border: '#E3E8E0',
+      primary: '#8FD14F',
+      accent: '#C4F07A',
+      positive: '#2F9447',
+      negative: '#D6493B',
+      chartPalette: ['#45A85A', '#B9E35B', '#F2938A', '#1F6B3A', '#8FD14F', '#FBBF24', '#60A5FA', '#94A3B8'],
+      fontFamily: INTER,
+      headingWeight: 600,
+      cardRadius: 16,
+      shadow: '0 1px 2px rgba(16, 40, 24, 0.06)',
+      spacingScale: 1.05,
+    },
+  },
 ];
 
 export const DEFAULT_THEME_ID = 'corporate-blue';

@@ -19,6 +19,7 @@ import { buildSemanticModel, type SemanticModel } from './semanticModel';
 import { semanticModelFiles } from './tmdl';
 import { exportRoute, HTML_CONTENT_VISUAL } from './fidelity';
 import { buildCardBackgroundContainer, buildVisualContainer, CARD_GLOW_MARGIN } from './visualContainer';
+import { buildCompositeParts, kpiContentInset } from './composites';
 
 const SCHEMA = 'https://developer.microsoft.com/json-schemas/fabric';
 export const PBIR_SCHEMAS = {
@@ -67,7 +68,7 @@ function htmlSection(spec: HandoffSpec, model: SemanticModel): string {
   return `
 ## Visuals drawn with HTML Content Secure
 
-Some design visuals have no built-in Power BI equivalent: stat cards with trend lines and icons, ring gauges, tables with icons, photos or pills, and hero text. To keep them looking exactly as designed, they use the certified AppSource visual **[${HTML_CONTENT_VISUAL.displayName}](${HTML_CONTENT_VISUAL.appSourceUrl})**. It is listed in \`report.json\`, and Power BI Desktop loads it from AppSource when the report opens (an internet connection is needed the first time).
+Some design visuals have no built-in Power BI equivalent: stat cards with trend lines, multi-ring gauges, tables with icons, photos or pills, card/tile/chip layouts, and hero text. To keep them looking exactly as designed, they use the certified AppSource visual **[${HTML_CONTENT_VISUAL.displayName}](${HTML_CONTENT_VISUAL.appSourceUrl})**. It is listed in \`report.json\`, and Power BI Desktop loads it from AppSource when the report opens (an internet connection is needed the first time).
 
 - Each one renders a measure in the display folder **"Design visuals (HTML)"**. The measure joins that visual's HTML from the hidden table **\`Design HTML\`**. The HTML is stored in chunks because model text values are limited to about 32,000 characters.
 - The HTML was captured from BI Design Studio's renderer with the design's **sample values**. Images (photos, illustrations, thumbnails) are embedded in it as base64.
@@ -119,7 +120,9 @@ ${htmlSection(spec, model)}
 ## Known differences from the design
 
 - Fonts: the design uses Inter; Power BI uses Segoe UI, which ships with it. Text can be slightly wider or narrower.
-- Native charts use Power BI's own drawing (for example solid area fills and square bar ends). Card surfaces Power BI cannot style (gradients, backdrop photos, dot textures, glows) are pictures placed behind the transparent native visual.
+- Native charts use Power BI's own drawing (for example solid area fills and square bar ends). Card surfaces Power BI cannot style (gradients, backdrop photos, dot textures, glows, translucent fills) are pictures placed behind the transparent native visual.
+- Some design visuals are several native visuals stacked (annotation \`BIDesignStudio.role\`). A KPI with a change or an icon is the card, a small card showing the change, and the icon picture. The change's font colour comes from the "… Change Colour" measure, so it follows real data. A ring gauge is a donut with a card in its centre. Select the parts together (Ctrl+click) and group them before moving them.
+- A page background picture, if the design has one, holds shapes drawn for the layout (for example a coloured hero band). It does not move when visuals are moved.
 - The slicer's default selection is not recreated.
 - These files were generated from Microsoft's published PBIR/TMDL formats but are not produced by Power BI itself. If Power BI Desktop reports a problem, the error message names the file to check.
 `;
@@ -135,7 +138,11 @@ export interface PbipAssets {
   html?: ReadonlyMap<string, string>;
   /** PNG data URLs of card surfaces Power BI cannot style, keyed by component id. */
   cardBackgrounds?: ReadonlyMap<string, string>;
+  /** PNG data URLs of KPI icons (round badge or corner icon), keyed by component id. */
+  kpiIcons?: ReadonlyMap<string, string>;
 }
+
+const imageRef = (item: string) => ({ expr: { ResourcePackageItem: { PackageName: 'RegisteredResources', PackageType: 1, ItemName: item } } });
 
 export function buildPbipProject(doc: DashboardDocument, exportedAt: string = new Date().toISOString(), assets: PbipAssets = {}): PbipProject {
   const spec = buildHandoffSpec(doc, exportedAt);
@@ -174,6 +181,8 @@ export function buildPbipProject(doc: DashboardDocument, exportedAt: string = ne
     pageOrder.push(pageName);
     const base = `${report}/definition/pages/${pageName}`;
     const pageBackground = doc.canvas.background ?? tokens.pageBackground;
+    // A background picture (e.g. a hero band drawn on the layout) covers the page exactly: same aspect ratio.
+    const backgroundImage = doc.canvas.backgroundImage ? addImage(doc.canvas.backgroundImage, `${doc.id}/page-background`) : undefined;
     files[`${base}/page.json`] = json({
       $schema: PBIR_SCHEMAS.page,
       name: pageName,
@@ -182,7 +191,11 @@ export function buildPbipProject(doc: DashboardDocument, exportedAt: string = ne
       height: page.height,
       width: page.width,
       objects: {
-        background: objectEntry({ color: lit.color(pageBackground), transparency: lit.num(0) }),
+        background: objectEntry({
+          color: lit.color(pageBackground),
+          ...(backgroundImage ? { image: { image: { name: lit.str(backgroundImage), url: imageRef(backgroundImage), scaling: lit.str('Fit') } } } : {}),
+          transparency: lit.num(0),
+        }),
         outspace: objectEntry({ color: lit.color(pageBackground), transparency: lit.num(0) }),
       },
     });
@@ -192,21 +205,39 @@ export function buildPbipProject(doc: DashboardDocument, exportedAt: string = ne
       const handoff = spec.pages[pi]!.visuals[ci]!;
       const htmlMeasure = model.htmlMeasures.get(c.id);
       const route = exportRoute(c);
-      const cardBackground = !htmlMeasure && route.kind === 'native' && 'cardBackground' in route ? assets.cardBackgrounds?.get(c.id) : undefined;
+      const native = !htmlMeasure && route.kind === 'native';
+      const cardBackground = native && route.cardBackground ? assets.cardBackgrounds?.get(c.id) : undefined;
+      const binding = model.bindings.get(c.id);
+      const iconImage = native && c.type === 'kpi' ? assets.kpiIcons?.get(c.id) : undefined;
+      const contentInset = native && c.type === 'kpi' ? kpiContentInset(c, handoff, Boolean(iconImage)) : undefined;
       const visual = buildVisualContainer({
         name,
         component: c,
         handoff,
-        binding: model.bindings.get(c.id),
+        binding,
         tokens,
         page,
         addImage,
         ...(htmlMeasure ? { htmlMeasure } : {}),
         ...(cardBackground ? { hasCardBackground: true } : {}),
+        ...(contentInset ? { contentInset } : {}),
       });
       if (!visual) return;
       files[`${base}/visuals/${name}/visual.json`] = json(visual);
       if (htmlMeasure) usesHtmlVisual = true;
+      if (native) {
+        const parts = buildCompositeParts({
+          component: c,
+          handoff,
+          tokens,
+          page,
+          addImage,
+          nameFor: (part) => pbirObjectName(`${doc.id}/${p.id}/${c.id}/${part}`, visualNames),
+          ...(binding ? { binding } : {}),
+          ...(iconImage ? { iconImage } : {}),
+        });
+        for (const part of parts) files[`${base}/visuals/${part.name}/visual.json`] = json(part);
+      }
       if (cardBackground) {
         const bgName = pbirObjectName(`${doc.id}/${p.id}/${c.id}/card-background`, visualNames);
         const bg = buildCardBackgroundContainer({

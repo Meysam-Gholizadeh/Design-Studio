@@ -64,6 +64,36 @@ test('PBIP export reproduces visuals without a native equivalent as HTML capture
   expect(errors).toEqual([]);
 });
 
+test('PBIP export builds the HR dashboard natively first: page picture, stacked cards, icon pictures, donut ring', async ({ page }) => {
+  test.setTimeout(180_000);
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  const { names, text, visuals } = await exportTemplate(page, 'hr-pulse-overview');
+  const role = (v: { annotations: { name: string; value: string }[] }) => v.annotations.find((a) => a.name === 'BIDesignStudio.role')?.value;
+  const resource = (item: string) => names.find((n) => n.endsWith(`RegisteredResources/${item}`));
+
+  // The hero band is the page background picture.
+  const pageJson = JSON.parse(text('/page.json'));
+  const bg = pageJson.objects.background[0].properties.image.image.url.expr.ResourcePackageItem.ItemName;
+  expect(resource(bg)).toBeTruthy();
+
+  // Only the four layouts with no built-in equivalent use the HTML visual.
+  expect(visuals.filter((v) => String(v.visual.visualType).startsWith('htmlContent'))).toHaveLength(4);
+
+  // Six people metrics carry their glowing icon as a picture; three tiles a change card and a picture of their glass surface.
+  const icons = visuals.filter((v) => role(v) === 'kpi-icon');
+  expect(icons).toHaveLength(6);
+  for (const icon of icons) expect(resource(icon.visual.objects.general[0].properties.imageUrl.expr.ResourcePackageItem.ItemName)).toBeTruthy();
+  expect(visuals.filter((v) => role(v) === 'kpi-change')).toHaveLength(3);
+  expect(visuals.filter((v) => role(v) === 'card-background')).toHaveLength(3);
+  expect(visuals.filter((v) => v.visual.visualType === 'multiRowCard')).toHaveLength(3);
+
+  // The efficiency ring is a native donut with a card in its centre.
+  expect(visuals.filter((v) => v.visual.visualType === 'donutChart')).toHaveLength(1);
+  expect(visuals.filter((v) => role(v) === 'ring-centre')).toHaveLength(1);
+  expect(errors).toEqual([]);
+});
+
 test('PBIP export keeps plain charts native over a picture of their card surface', async ({ page }) => {
   test.setTimeout(180_000);
   const { names, visuals } = await exportTemplate(page, 'storefront-overview');
