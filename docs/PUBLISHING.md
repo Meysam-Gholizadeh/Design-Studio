@@ -38,6 +38,19 @@ A custom visual can be shown in the gallery **with or without** a download butto
 - **Stored in the list:** the setting is the item's `downloadable` field in `manifest.json`. Lists written before this setting existed count as "on".
 - **Repository visibility:** if the GitHub repository is **public**, a held file can still be downloaded from GitHub itself. Make the repository private if that matters. Turning the download off also does not recall copies people already downloaded.
 
+## Open a report inside the portal (2026-11-12, user request)
+
+A browser cannot render a `.pbix` file. Only Power BI can. The user chose Power BI's **"Publish to web"** link, out of three options: Publish to web, secure Power BI Embedded with a server and Azure capacity, or page screenshots.
+
+- **Get the link.** In the Power BI service, open the report and choose **File → Embed report → Publish to web (public)**. Copy the link (`https://app.powerbi.com/view?r=…`) or the iframe embed code. This needs a Power BI Pro (or PPU) licence, and the tenant admin must allow "Publish to web".
+- **Add it on `/admin`.** Paste it in the "Publish to web" field when publishing, or later with **Add Power BI link** on the report's row. The later route commits only `manifest.json`, so nothing is uploaded again. Saving the field empty removes the link.
+- **What visitors get.**
+  - The gallery card gets **Open report**, which goes to `/gallery/files/<id>`.
+  - That page shows the live, interactive report in an iframe served by Power BI, with **Open in Power BI** and **Download .pbix** buttons.
+  - A report without a link shows a clear message on that page, not an empty frame.
+- **Only these links are accepted** (`parsePowerBiEmbedUrl` in `src/domain/schemas/published.ts`): `https://<Power BI host>/view?r=<key>`, with an optional `pageName`. The host can be the commercial or a national-cloud Power BI host. The link is re-validated when the list loads, so the portal can only ever frame a Power BI page. A report's own `app.powerbi.com/groups/…` address is refused, because it needs a sign-in.
+- **Public by design.** Anyone with the link can view the report and its data. Use "Publish to web" only for data that may be public. To make it private again, delete the embed code in the Power BI service (**Settings → Manage embed codes**); the portal page then shows Power BI's own "not available" message.
+
 ## One-time setup
 
 ### 1. GitHub token

@@ -48,6 +48,15 @@ export const publishedItemSchema = z.object({
    * so it cannot be fetched from the site even by its address. Reports are always downloadable.
    */
   downloadable: z.boolean().default(true),
+  /**
+   * Power BI "Publish to web" link (`https://app.powerbi.com/view?r=…`) so the
+   * report opens inside the portal. Public to anyone with the link, by Power BI's design.
+   */
+  embedUrl: z
+    .string()
+    .max(2000)
+    .refine((v) => parsePowerBiEmbedUrl(v) === v, 'Use a Power BI “Publish to web” link (https://app.powerbi.com/view?r=…).')
+    .optional(),
   /** Read from a custom visual's package.json. */
   visual: z
     .object({
@@ -65,5 +74,33 @@ export const publishedManifestSchema = z.object({
   items: z.array(publishedItemSchema).max(500),
 });
 export type PublishedManifest = z.output<typeof publishedManifestSchema>;
+
+/** Power BI service hosts (commercial and national clouds) that serve "Publish to web" reports. */
+const POWER_BI_HOSTS = ['app.powerbi.com', 'app.powerbigov.us', 'app.high.powerbigov.us', 'app.mil.powerbigov.us', 'app.powerbi.cn', 'app.powerbi.de'];
+
+/**
+ * Accept a "Publish to web" link, or the iframe embed code Power BI offers next
+ * to it, and return the clean link, or null when it isn't one. Only
+ * `https://<power bi host>/view?r=<key>` (plus optional pageName) is allowed,
+ * so nothing but a Power BI page can be framed by the portal.
+ */
+export function parsePowerBiEmbedUrl(input: string): string | null {
+  const text = input.trim();
+  const src = /<iframe[^>]*\ssrc\s*=\s*["']([^"']+)["']/i.exec(text)?.[1] ?? text;
+  let url: URL;
+  try {
+    url = new URL(src.replace(/&amp;/g, '&'));
+  } catch {
+    return null;
+  }
+  // The key is base64; a raw "+" in it reads back as a space.
+  const key = url.searchParams.get('r')?.replace(/ /g, '+');
+  if (url.protocol !== 'https:' || !POWER_BI_HOSTS.includes(url.hostname) || url.pathname !== '/view' || !key || !/^[A-Za-z0-9+/=_-]{10,1500}$/.test(key)) return null;
+  const clean = new URL(`https://${url.hostname}/view`);
+  clean.searchParams.set('r', key);
+  const pageName = url.searchParams.get('pageName');
+  if (pageName && /^[A-Za-z0-9_-]{1,100}$/.test(pageName)) clean.searchParams.set('pageName', pageName);
+  return clean.toString();
+}
 
 export const EMPTY_MANIFEST: PublishedManifest = { schemaVersion: 1, items: [] };

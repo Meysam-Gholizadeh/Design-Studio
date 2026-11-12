@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { BarChart3, ExternalLink, ListChecks, Puzzle, Trash2 } from 'lucide-react';
+import { useState, type FormEvent } from 'react';
+import { BarChart3, ExternalLink, Link2, ListChecks, Puzzle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import type { PublishedItem, PublishedManifest } from '@/domain/schemas/published';
+import { parsePowerBiEmbedUrl, type PublishedItem, type PublishedManifest } from '@/domain/schemas/published';
+import { EMBED_HELP } from '@/services/published/preparePublication';
 import { createGithubPublisher, type GithubTarget } from '@/services/published/githubPublisher';
 import { formatBytes } from '@/services/published/manifest';
 import styles from './Admin.module.css';
@@ -24,6 +25,8 @@ export function PublishedList({ target, manifest, loadError, onChanged, onReload
   /** The switch shows the requested state while its commit is saved (reverts if it fails). */
   const [pendingDownload, setPendingDownload] = useState<{ id: string; on: boolean } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  /** The report whose Power BI link is being edited. */
+  const [linkEdit, setLinkEdit] = useState<{ id: string; value: string; error: string | null } | null>(null);
 
   const run = async (item: PublishedItem, action: () => Promise<PublishedManifest>, done: string, failed: string) => {
     setWorking(item.id);
@@ -42,6 +45,22 @@ export function PublishedList({ target, manifest, loadError, onChanged, onReload
     const item = pending;
     setPending(null);
     await run(item, () => createGithubPublisher(target).remove(item), `“${item.title}” was removed. The gallery updates after the next deploy.`, 'The item could not be removed.');
+  };
+
+  const saveLink = async (e: FormEvent, item: PublishedItem) => {
+    e.preventDefault();
+    if (!linkEdit) return;
+    const text = linkEdit.value.trim();
+    const url = text ? parsePowerBiEmbedUrl(text) : null;
+    if (text && !url) return setLinkEdit({ ...linkEdit, error: EMBED_HELP });
+    if ((url ?? undefined) === item.embedUrl) return setLinkEdit(null);
+    await run(
+      item,
+      () => createGithubPublisher(target).setEmbedUrl(item, url),
+      url ? `“${item.title}” can be opened in the portal after the next deploy.` : `The Power BI link of “${item.title}” was removed.`,
+      'The link could not be saved.',
+    );
+    setLinkEdit(null);
   };
 
   const toggleDownload = async (item: PublishedItem, on: boolean) => {
@@ -106,9 +125,52 @@ export function PublishedList({ target, manifest, loadError, onChanged, onReload
                     {working === item.id ? 'Saving…' : item.downloadable ? 'Download on' : 'Download off'}
                   </label>
                 )}
+                {item.kind === 'pbix' && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    icon={<Link2 size={15} aria-hidden="true" />}
+                    onClick={() => setLinkEdit(linkEdit?.id === item.id ? null : { id: item.id, value: item.embedUrl ?? '', error: null })}
+                    disabled={working !== null}
+                    aria-expanded={linkEdit?.id === item.id}
+                    aria-label={`Power BI link of ${item.title}`}
+                  >
+                    {item.embedUrl ? 'Power BI link' : 'Add Power BI link'}
+                  </Button>
+                )}
                 <Button size="sm" variant="ghost" icon={<Trash2 size={15} aria-hidden="true" />} onClick={() => setPending(item)} disabled={working !== null} aria-label={`Remove ${item.title}`}>
                   Remove
                 </Button>
+                {linkEdit?.id === item.id && (
+                  <form className={styles.linkEditor} onSubmit={(e) => void saveLink(e, item)} noValidate>
+                    <label className={styles.field}>
+                      “Publish to web” link or embed code
+                      <input
+                        className={styles.input}
+                        value={linkEdit.value}
+                        onChange={(e) => setLinkEdit({ ...linkEdit, value: e.target.value, error: null })}
+                        placeholder="https://app.powerbi.com/view?r=…"
+                        spellCheck={false}
+                        aria-invalid={linkEdit.error ? true : undefined}
+                        disabled={working !== null}
+                      />
+                    </label>
+                    <span className={styles.help}>With a link, the gallery card gets “Open report”, which shows the live report inside the portal. Leave empty and save to remove it.</span>
+                    {linkEdit.error && (
+                      <p className={styles.error} role="alert">
+                        {linkEdit.error}
+                      </p>
+                    )}
+                    <div className={styles.row}>
+                      <Button type="submit" size="sm" variant="primary" disabled={working !== null}>
+                        {working === item.id ? 'Saving…' : 'Save link'}
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setLinkEdit(null)} disabled={working !== null}>
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                )}
               </li>
             );
           })}

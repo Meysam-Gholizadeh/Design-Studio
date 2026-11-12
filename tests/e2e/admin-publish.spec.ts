@@ -82,10 +82,22 @@ test('admin connects to GitHub, publishes a .pbix with a preview and removes it'
   expect(paths[2]).toBe('public/published/manifest.json');
   expect(JSON.parse(github.manifest!)).toMatchObject({ schemaVersion: 1, items: [{ title: 'Sales report', categoryId: 'finance', tags: ['Sales', 'Monthly'], kind: 'pbix' }] });
 
+  // Add a "Publish to web" link to the published report (only the list changes).
+  await page.getByRole('button', { name: 'Power BI link of Sales report' }).click();
+  const linkInput = page.getByLabel('“Publish to web” link or embed code');
+  await linkInput.fill('https://app.powerbi.com/groups/me/reports/123');
+  await page.getByRole('button', { name: 'Save link' }).click();
+  await expect(page.getByRole('alert')).toContainText('Publish to web');
+  await linkInput.fill('<iframe title="x" src="https://app.powerbi.com/view?r=eyJrIjoiYWJjZGVmZ2hpams&amp;pageName=Overview"></iframe>');
+  await page.getByRole('button', { name: 'Save link' }).click();
+  await expect(page.getByText(/can be opened in the portal/)).toBeVisible();
+  expect(github.trees[1]!.map((e) => e.path)).toEqual(['public/published/manifest.json']);
+  expect(JSON.parse(github.manifest!).items[0].embedUrl).toBe('https://app.powerbi.com/view?r=eyJrIjoiYWJjZGVmZ2hpams&pageName=Overview');
+
   await page.getByRole('button', { name: 'Remove Sales report' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Remove' }).click();
   await expect(page.getByText('Nothing is published yet.')).toBeVisible();
-  expect(github.trees[1]!.filter((e) => e.sha === null)).toHaveLength(2);
+  expect(github.trees[2]!.filter((e) => e.sha === null)).toHaveLength(2);
 });
 
 test('a custom visual can be published with downloads off and switched on later', async ({ page }) => {
@@ -143,6 +155,7 @@ test('the gallery lists published Power BI files with a download link and filter
         tags: [],
         file: { path: 'published/hr-report-0002/Workforce.pbix', name: 'Workforce.pbix', size: 2_400_000 },
         preview: { path: 'published/hr-report-0002/preview.png' },
+        embedUrl: 'https://app.powerbi.com/view?r=eyJrIjoiYWJjZGVmZ2hpams',
         publishedAt: '2026-11-12T10:00:00.000Z',
       },
     ],
@@ -159,6 +172,20 @@ test('the gallery lists published Power BI files with a download link and filter
   // The visual's downloads are off: no link, an explanation instead. The report has no setting (lists before it mean "on").
   await expect(section.getByRole('link', { name: /Download Ring-gauge/ })).toHaveCount(0);
   await expect(section.getByText('Shown for reference; download is not offered.')).toBeVisible();
+
+  // A report with a "Publish to web" link opens inside the portal (Power BI stubbed: no network in tests).
+  await page.route('https://app.powerbi.com/**', (route) => route.fulfill({ contentType: 'text/html', body: '<h1>Power BI report stub</h1>' }));
+  await section.getByRole('link', { name: 'Open report' }).click();
+  await expect(page).toHaveURL(/\/gallery\/files\/hr-report-0002$/);
+  await expect(page.getByRole('heading', { name: 'Workforce report' })).toBeVisible();
+  const frame = page.locator('iframe[title="Workforce report (Power BI report)"]');
+  await expect(frame).toHaveAttribute('src', 'https://app.powerbi.com/view?r=eyJrIjoiYWJjZGVmZ2hpams');
+  await expect(page.frameLocator('iframe').getByRole('heading', { name: 'Power BI report stub' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Download \.pbix/ })).toHaveAttribute('href', '/published/hr-report-0002/Workforce.pbix');
+
+  // Without a link there is nothing to open: an honest message instead of an empty frame.
+  await page.goto('/gallery/files/ring-gauge-0001');
+  await expect(page.getByRole('heading', { name: 'This report cannot be opened in the portal' })).toBeVisible();
 
   await page.goto('/gallery?category=hr');
   await expect(page.getByTestId('published-card')).toHaveCount(1);

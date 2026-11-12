@@ -1,4 +1,5 @@
-import { BarChart3, Download, Lock, Puzzle } from 'lucide-react';
+import { Link } from 'react-router';
+import { BarChart3, Download, Eye, Lock, Puzzle } from 'lucide-react';
 import type { PublishedItem } from '@/domain/schemas/published';
 import { templateRepository } from '@/services/templateService';
 import { formatBytes } from '@/services/published/manifest';
@@ -46,17 +47,31 @@ export function PublishedCard({ item }: { item: PublishedItem }) {
             ))}
           </ul>
         )}
-        {item.downloadable ? (
-          <a className={styles.download} href={`/${item.file.path}`} download={item.file.name}>
-            <Download size={15} aria-hidden="true" />
-            Download {item.file.name}
-          </a>
-        ) : (
-          <p className={styles.noDownload}>
-            <Lock size={14} aria-hidden="true" />
-            Shown for reference; download is not offered.
-          </p>
-        )}
+        <div className={styles.actions}>
+          {item.embedUrl && (
+            <Link className={styles.download} to={`/gallery/files/${item.id}`}>
+              <Eye size={15} aria-hidden="true" />
+              Open report
+            </Link>
+          )}
+          {item.downloadable ? (
+            <a
+              className={item.embedUrl ? styles.secondary : styles.download}
+              href={`/${item.file.path}`}
+              download={item.file.name}
+              aria-label={`Download ${item.file.name}`}
+              title={`Download ${item.file.name}`}
+            >
+              <Download size={15} aria-hidden="true" />
+              {item.embedUrl ? 'Download' : `Download ${item.file.name}`}
+            </a>
+          ) : (
+            <p className={styles.noDownload}>
+              <Lock size={14} aria-hidden="true" />
+              Shown for reference; download is not offered.
+            </p>
+          )}
+        </div>
       </div>
     </article>
   );

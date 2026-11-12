@@ -1,6 +1,6 @@
 import { strToU8 as rawStrToU8, zipSync } from 'fflate';
 import { describe, expect, it, vi } from 'vitest';
-import { EMPTY_MANIFEST, type PublishedItem } from '@/domain/schemas/published';
+import { EMPTY_MANIFEST, parsePowerBiEmbedUrl, type PublishedItem } from '@/domain/schemas/published';
 import { createGithubPublisher, encodeBase64 } from '@/services/published/githubPublisher';
 import { looksLikeGithubToken } from '@/services/published/githubSettings';
 import { checkPreviewImage, inspectPowerBiFile } from '@/services/published/inspectFile';
@@ -232,6 +232,60 @@ describe('githubPublisher', () => {
     await expect(createGithubPublisher(target, unauthorized).readManifest()).rejects.toThrow(/rejected the token/);
     await expect(createGithubPublisher(target, fakeGithub({ repoPush: false }).fetchImpl).verify()).rejects.toThrow(/cannot write/);
     await expect(createGithubPublisher(target, fakeGithub().fetchImpl).verify()).resolves.toEqual({ fullName: 'me/site' });
+  });
+});
+
+describe('Power BI "Publish to web" links', () => {
+  const key = 'eyJrIjoiNWQ1YzQ2ZTgtZmE0ZiIsInQiOiJhYmMifQ%3D%3D';
+  const link = `https://app.powerbi.com/view?r=${key}`;
+
+  it('accepts the link and the embed code, and keeps only the key and page', () => {
+    expect(parsePowerBiEmbedUrl(link)).toBe(link);
+    expect(parsePowerBiEmbedUrl(`  ${link}&pageName=ReportSection1&extra=1 `)).toBe(`${link}&pageName=ReportSection1`);
+    expect(parsePowerBiEmbedUrl(`<iframe title="Sales" width="1140" height="541.25" src="${link}&amp;pageName=Overview" frameborder="0" allowFullScreen="true"></iframe>`)).toBe(
+      `${link}&pageName=Overview`,
+    );
+    expect(parsePowerBiEmbedUrl('https://app.powerbigov.us/view?r=abcdefghijkl')).toBe('https://app.powerbigov.us/view?r=abcdefghijkl');
+  });
+
+  it('rejects other sites, signed-in report links and unsafe schemes', () => {
+    expect(parsePowerBiEmbedUrl(`http://app.powerbi.com/view?r=${key}`)).toBeNull();
+    expect(parsePowerBiEmbedUrl(`https://evil.example/view?r=${key}`)).toBeNull();
+    expect(parsePowerBiEmbedUrl(`https://app.powerbi.com.evil.example/view?r=${key}`)).toBeNull();
+    expect(parsePowerBiEmbedUrl('https://app.powerbi.com/groups/me/reports/1234/ReportSection')).toBeNull();
+    expect(parsePowerBiEmbedUrl('javascript:alert(1)')).toBeNull();
+    expect(parsePowerBiEmbedUrl('not a link')).toBeNull();
+  });
+
+  it('stores a link on a report when publishing, and refuses a wrong one', () => {
+    const base = { file: { name: 'r.pbix', bytes: pbix() }, inspected: { kind: 'pbix' as const }, preview: null, title: 'Report', description: '', categoryId: '', tags: '', id: 'report-ab12' };
+    expect(preparePublication({ ...base, embed: link }).item.embedUrl).toBe(link);
+    expect(preparePublication({ ...base, embed: '' }).item.embedUrl).toBeUndefined();
+    expect(() => preparePublication({ ...base, embed: 'https://app.powerbi.com/groups/me/reports/1' })).toThrow(/Publish to web/);
+    expect(() => parseManifest(JSON.stringify({ schemaVersion: 1, items: [{ ...item(), embedUrl: 'https://evil.example/x' }] }))).toThrow(/invalid/);
+  });
+
+  it('sets and clears the link in one commit that only rewrites the list', async () => {
+    const json = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
+    let stored = serializeManifest({ schemaVersion: 1, items: [item()] });
+    const posted: Array<{ url: string; body: { tree?: Array<{ path: string }>; content?: string } }> = [];
+    const fetchImpl = vi.fn(async (url: string, init?: RequestInit) => {
+      const body = init?.body ? (JSON.parse(String(init.body)) as { tree?: Array<{ path: string }>; content?: string }) : {};
+      if (init?.method === 'POST') posted.push({ url, body });
+      if (url.endsWith('/git/ref/heads/main')) return json({ object: { sha: 'c1' } });
+      if (url.endsWith('/git/commits/c1')) return json({ tree: { sha: 't1' } });
+      if (url.includes('/contents/public/published/manifest.json')) return json({ encoding: 'base64', content: encodeBase64(strToU8(stored)) });
+      if (url.endsWith('/git/blobs')) {
+        stored = body.content ?? stored;
+        return json({ sha: 'b1' }, 201);
+      }
+      return json({ sha: 'x', object: { sha: 'x' } }, 201);
+    });
+    const publisher = createGithubPublisher({ owner: 'me', repo: 'site', branch: 'main', token: 't' }, fetchImpl);
+    expect((await publisher.setEmbedUrl(item(), link)).items[0]!.embedUrl).toBe(link);
+    expect(posted.find((p) => p.url.endsWith('/git/trees'))!.body.tree!.map((e) => e.path)).toEqual(['public/published/manifest.json']);
+    const cleared = await publisher.setEmbedUrl(item(), null);
+    expect('embedUrl' in cleared.items[0]!).toBe(false);
   });
 });
 

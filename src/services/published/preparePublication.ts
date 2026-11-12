@@ -1,5 +1,8 @@
 import { CATEGORY_IDS } from '@/domain/schemas/catalog';
-import { publishedItemSchema, type PublishedItem } from '@/domain/schemas/published';
+import { parsePowerBiEmbedUrl, publishedItemSchema, type PublishedItem } from '@/domain/schemas/published';
+
+export const EMBED_HELP =
+  'Power BI link: paste the “Publish to web” link (https://app.powerbi.com/view?r=…) or the embed code shown with it. Other Power BI links (for example a report’s own address) need a sign-in and cannot open in the portal.';
 import type { FileToCommit } from './githubPublisher';
 import type { InspectedFile } from './inspectFile';
 import { fileRepoPath, makePublishedId, safeFileName } from './manifest';
@@ -15,6 +18,8 @@ export interface PublicationInput {
   tags: string;
   /** Custom visuals only; reports are always downloadable. */
   downloadable?: boolean;
+  /** Reports only: "Publish to web" link or embed code; empty for none. */
+  embed?: string;
   now?: Date;
   id?: string;
 }
@@ -27,6 +32,9 @@ export function preparePublication(input: PublicationInput): { item: PublishedIt
   const folder = `published/${id}`;
   const tags = [...new Set(input.tags.split(',').map((t) => t.trim()).filter(Boolean))].slice(0, 12);
   const categoryId = CATEGORY_IDS.find((c) => c === input.categoryId) ?? null;
+  const embedText = kind === 'pbix' ? (input.embed ?? '').trim() : '';
+  const embedUrl = embedText ? parsePowerBiEmbedUrl(embedText) : null;
+  if (embedText && !embedUrl) throw new Error(EMBED_HELP);
 
   const candidate = {
     id,
@@ -38,6 +46,7 @@ export function preparePublication(input: PublicationInput): { item: PublishedIt
     file: { path: `${folder}/${fileName}`, name: fileName, size: input.file.bytes.byteLength },
     preview: input.preview ? { path: `${folder}/preview.${input.preview.ext}` } : null,
     downloadable: kind === 'pbix' ? true : (input.downloadable ?? true),
+    ...(embedUrl ? { embedUrl } : {}),
     ...(input.inspected.visual ? { visual: input.inspected.visual } : {}),
     publishedAt: (input.now ?? new Date()).toISOString(),
   };

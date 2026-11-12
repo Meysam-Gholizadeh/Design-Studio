@@ -662,6 +662,12 @@ Details are in `docs/PUBLISHING.md`.
   - **Older lists:** the `downloadable` field defaults to true.
   - **Tests:** 3 more unit tests (move off/on, removal from the held folder, missing file, paths, default for old lists) and 1 more E2E test (publish with downloads off, then switch them on).
   - **Caveat:** in a public GitHub repository, held files are still visible on GitHub.
+- **Open reports in the portal** (same day, user request; the user chose a Power BI "Publish to web" link):
+  - **Schema:** optional `embedUrl`, validated so that only `https://<Power BI host>/view?r=…` is accepted. The embed code is accepted and turned into the link.
+  - **Admin:** set the link when publishing, or add, change or clear it on a published report's row. That is one commit that rewrites only `manifest.json`.
+  - **Gallery:** the card gets **Open report**. The new page `/gallery/files/:itemId` frames the report and offers Open in Power BI and Download. Reports without a link get an explanatory message.
+  - **Tests:** 4 more unit tests (link parsing, accepted and refused hosts and paths, publishing with a link, the set/clear commit). E2E now covers adding the link on `/admin`, including refusing a wrong link, and opening the report page with Power BI stubbed.
+  - **Not yet verified:** a real "Publish to web" report shown on the live site.
 
 ## Fitness Overview (2026-11-06, user request with a reference screenshot)
 - **Request:** build the reference's fitness dashboard keeping all details, and find similar images on the web.

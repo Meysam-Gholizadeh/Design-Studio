@@ -41,6 +41,18 @@ export function removeItem(manifest: PublishedManifest, id: string): PublishedMa
   return { ...manifest, items: manifest.items.filter((i) => i.id !== id) };
 }
 
+/** Set or clear (null) an item's "Publish to web" link. */
+export function setItemEmbedUrl(manifest: PublishedManifest, id: string, embedUrl: string | null): PublishedManifest {
+  return {
+    ...manifest,
+    items: manifest.items.map((i) => {
+      if (i.id !== id) return i;
+      const { embedUrl: _old, ...rest } = i;
+      return embedUrl ? { ...rest, embedUrl } : rest;
+    }),
+  };
+}
+
 export function setItemDownloadable(manifest: PublishedManifest, id: string, downloadable: boolean): PublishedManifest {
   return { ...manifest, items: manifest.items.map((i) => (i.id === id ? { ...i, downloadable } : i)) };
 }

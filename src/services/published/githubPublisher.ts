@@ -8,7 +8,7 @@
  * read and write on this one repository). Nothing else holds the token.
  */
 import { EMPTY_MANIFEST, type PublishedItem, type PublishedManifest } from '@/domain/schemas/published';
-import { MANIFEST_REPO_PATH, addItem, fileRepoPath, parseManifest, removeItem, serializeManifest, setItemDownloadable } from './manifest';
+import { MANIFEST_REPO_PATH, addItem, fileRepoPath, parseManifest, removeItem, serializeManifest, setItemDownloadable, setItemEmbedUrl } from './manifest';
 
 export interface GithubTarget {
   owner: string;
@@ -142,6 +142,14 @@ export function createGithubPublisher(target: GithubTarget, fetchImpl: FetchLike
         const current = m.items.find((i) => i.id === item.id) ?? item;
         const deletes = [fileRepoPath(current, current.downloadable), ...(current.preview ? [`public/${current.preview.path}`] : [])];
         return { next: removeItem(m, item.id), deletes };
+      });
+    },
+
+    /** Set or clear the "Publish to web" link (only the list changes). */
+    setEmbedUrl(item: PublishedItem, embedUrl: string | null): Promise<PublishedManifest> {
+      return commit(`${embedUrl ? 'Set' : 'Remove'} the Power BI link of "${item.title}"`, (m) => {
+        if (!m.items.some((i) => i.id === item.id)) throw new GithubError(`“${item.title}” is no longer published on the ${target.branch} branch. Reload the list.`);
+        return { next: setItemEmbedUrl(m, item.id, embedUrl) };
       });
     },
 

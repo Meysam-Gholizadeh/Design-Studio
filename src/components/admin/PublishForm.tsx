@@ -39,6 +39,7 @@ export function PublishForm({ target, onPublished }: PublishFormProps) {
   const [categoryId, setCategoryId] = useState('');
   const [tags, setTags] = useState('');
   const [downloadable, setDownloadable] = useState(true);
+  const [embed, setEmbed] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -85,6 +86,7 @@ export function PublishForm({ target, onPublished }: PublishFormProps) {
     setCategoryId('');
     setTags('');
     setDownloadable(true);
+    setEmbed('');
     if (fileRef.current) fileRef.current.value = '';
     if (previewRef.current) previewRef.current.value = '';
   };
@@ -96,7 +98,7 @@ export function PublishForm({ target, onPublished }: PublishFormProps) {
     setError(null);
     setBusy(true);
     try {
-      const { item, files } = preparePublication({ file, inspected: file.inspected, preview, title, description, categoryId, tags, downloadable });
+      const { item, files } = preparePublication({ file, inspected: file.inspected, preview, title, description, categoryId, tags, downloadable, embed });
       const manifest = await createGithubPublisher(target).publish(item, files);
       onPublished(manifest, item.title);
       reset();
@@ -179,6 +181,18 @@ export function PublishForm({ target, onPublished }: PublishFormProps) {
             <span className={styles.help}>A screenshot of the report or visual: PNG, JPEG or WebP, up to 2 MB, ideally 16:10.</span>
           </label>
           {preview && <img src={preview.url} alt="Chosen preview" className={styles.previewThumb} />}
+          {file?.inspected.kind === 'pbix' && (
+            <label className={`${styles.field} ${styles.wide}`}>
+              <span>
+                Power BI “Publish to web” link <span className={styles.optional}>(optional, lets visitors open the report in the portal)</span>
+              </span>
+              <input className={styles.input} value={embed} onChange={(e) => setEmbed(e.target.value)} placeholder="https://app.powerbi.com/view?r=…" disabled={busy} spellCheck={false} />
+              <span className={styles.help}>
+                In the Power BI service: open the report → File → Embed report → Publish to web (public). Paste the link or the embed code. Anyone with the link can see the
+                report, so use it only for data that may be public.
+              </span>
+            </label>
+          )}
           {file?.inspected.kind === 'pbiviz' && (
             <div className={`${styles.field} ${styles.wide}`}>
               <label className={styles.switch}>

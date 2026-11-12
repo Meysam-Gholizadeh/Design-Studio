@@ -1,0 +1,137 @@
+.page {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-8) var(--space-8);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.headerText {
+  min-width: 0;
+  max-width: 760px;
+}
+
+.category {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-accent-text);
+}
+
+.title {
+  margin-top: 4px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.description {
+  margin-top: 4px;
+  color: var(--app-text-2);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.primaryLink,
+.secondaryLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.primaryLink {
+  background: var(--app-accent);
+  color: var(--app-on-accent);
+}
+
+.primaryLink:hover {
+  background: var(--app-accent-hover);
+  text-decoration: none;
+}
+
+.secondaryLink {
+  border: 1px solid var(--app-border-strong);
+  background: var(--app-surface);
+  color: var(--app-text);
+}
+
+.secondaryLink:hover {
+  background: var(--app-surface-2);
+  text-decoration: none;
+}
+
+.primaryLink:focus-visible,
+.secondaryLink:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Power BI pages are 16:9 by default; keep the whole page visible on wide screens. */
+.frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9.6;
+  max-height: calc(100vh - 170px);
+  min-height: 360px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--radius-lg);
+  background: var(--app-surface);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+}
+
+.frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.note {
+  margin-top: var(--space-3);
+  font-size: 12.5px;
+  color: var(--app-text-3);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--app-text-2);
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding: var(--space-5) var(--space-4) var(--space-8);
+  }
+}
