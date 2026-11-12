@@ -1,8 +1,5 @@
 {
   "schemaVersion": 1,
-<<<<<<< HEAD
-  "items": []
-=======
   "items": [
     {
       "id": "power-bi-matrixone-i3ws",
@@ -21,5 +18,4 @@
       "publishedAt": "2026-11-12T08:54:05.051Z"
     }
   ]
->>>>>>> 4d2d2b7aaaa89a8e2d120716f1acb49db58e01fd
 }
