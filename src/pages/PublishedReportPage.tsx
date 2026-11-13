@@ -1,8 +1,9 @@
 import { useParams } from 'react-router';
-import { ArrowLeft, Download, ExternalLink, FileQuestion, Loader2 } from 'lucide-react';
+import { ArrowLeft, ExternalLink, FileQuestion, Loader2 } from 'lucide-react';
 import { ButtonLink } from '@/components/common/Button';
 import { EmptyState } from '@/components/common/EmptyState';
 import { CategoryIcon } from '@/components/gallery/CategoryIcon';
+import { FileRequestButton } from '@/components/gallery/FileRequestButton';
 import { templateRepository } from '@/services/templateService';
 import { usePublishedItems } from '@/services/published/usePublishedItems';
 import page from './Page.module.css';
@@ -69,11 +70,7 @@ export function PublishedReportPage() {
           <a className={styles.secondaryLink} href={item.embedUrl} target="_blank" rel="noreferrer">
             <ExternalLink size={16} aria-hidden="true" /> Open in Power BI
           </a>
-          {item.downloadable && (
-            <a className={styles.primaryLink} href={`/${item.file.path}`} download={item.file.name}>
-              <Download size={16} aria-hidden="true" /> Download .pbix
-            </a>
-          )}
+          {item.downloadable && <FileRequestButton item={item} className={styles.primaryLink} label="Download .pbix" />}
         </div>
       </header>
       <div className={styles.frame}>

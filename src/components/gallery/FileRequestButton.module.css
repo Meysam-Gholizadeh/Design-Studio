@@ -1,0 +1,21 @@
+.mail {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  background: var(--app-accent-soft);
+  color: var(--app-accent-text);
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.mail:hover {
+  text-decoration: underline;
+}
+
+.mail:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}

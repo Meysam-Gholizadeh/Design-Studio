@@ -51,6 +51,13 @@ A browser cannot render a `.pbix` file. Only Power BI can. The user chose Power 
 - **Only these links are accepted** (`parsePowerBiEmbedUrl` in `src/domain/schemas/published.ts`): `https://<Power BI host>/view?r=<key>`, with an optional `pageName`. The host can be the commercial or a national-cloud Power BI host. The link is re-validated when the list loads, so the portal can only ever frame a Power BI page. A report's own `app.powerbi.com/groups/…` address is refused, because it needs a sign-in.
 - **Public by design.** Anyone with the link can view the report and its data. Use "Publish to web" only for data that may be public. To make it private again, delete the embed code in the Power BI service (**Settings → Manage embed codes**); the portal page then shows Power BI's own "not available" message.
 
+## Download buttons show the owner's contact details (2026-11-13, user request)
+
+The gallery card's **Download** button and the report page's **Download .pbix** button no longer download. They open a dialog: "If you want to have the custom visual (PBIVIZ or PBIX) file, please contact the owner:", followed by an email link with the file's name in the subject. The address is in `src/data/siteOwner.ts` (`OWNER_CONTACT_EMAIL`).
+
+- **Shown only for downloadable files.** Custom visuals with downloads switched off still say "download is not offered".
+- **The files are still reachable by address.** Files with downloads on stay in `public/published/…`, and their path is listed in the public `manifest.json`, so someone who reads it can still fetch the file directly. To make a custom visual truly unavailable, switch its downloads off on `/admin`, which moves it out of `public/`. Reports (`.pbix`) have no such switch yet.
+
 ## One-time setup
 
 ### 1. GitHub token

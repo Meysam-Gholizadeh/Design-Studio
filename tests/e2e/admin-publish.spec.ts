@@ -167,10 +167,19 @@ test('the gallery lists published Power BI files with a download link and filter
   const section = page.getByTestId('published-section');
   await expect(section.getByRole('heading', { name: 'Power BI files' })).toBeVisible();
   await expect(section.getByTestId('published-card')).toHaveCount(2);
-  await expect(section.getByRole('link', { name: 'Download Workforce.pbix' })).toHaveAttribute('href', '/published/hr-report-0002/Workforce.pbix');
+  // Download shows the owner's contact details instead of downloading.
+  let downloads = 0;
+  page.on('download', () => downloads++);
+  await section.getByRole('button', { name: 'Download Workforce.pbix' }).click();
+  const contact = page.getByRole('dialog', { name: 'Request this file' });
+  await expect(contact).toContainText('If you want to have the custom visual (PBIVIZ or PBIX) file, please contact the owner:');
+  await expect(contact.getByRole('link', { name: 'meisam.gholizadeh@hotmail.com' })).toHaveAttribute('href', /^mailto:meisam\.gholizadeh@hotmail\.com\?subject=/);
+  await contact.getByRole('button', { name: 'Close' }).click();
+  await expect(contact).toBeHidden();
+  expect(downloads).toBe(0);
   await expect(section.getByText('Custom visual (.pbiviz)')).toBeVisible();
   // The visual's downloads are off: no link, an explanation instead. The report has no setting (lists before it mean "on").
-  await expect(section.getByRole('link', { name: /Download Ring-gauge/ })).toHaveCount(0);
+  await expect(section.getByRole('button', { name: /Download Ring-gauge/ })).toHaveCount(0);
   await expect(section.getByText('Shown for reference; download is not offered.')).toBeVisible();
 
   // A report with a "Publish to web" link opens inside the portal (Power BI stubbed: no network in tests).
@@ -181,7 +190,8 @@ test('the gallery lists published Power BI files with a download link and filter
   const frame = page.locator('iframe[title="Workforce report (Power BI report)"]');
   await expect(frame).toHaveAttribute('src', 'https://app.powerbi.com/view?r=eyJrIjoiYWJjZGVmZ2hpams');
   await expect(page.frameLocator('iframe').getByRole('heading', { name: 'Power BI report stub' })).toBeVisible();
-  await expect(page.getByRole('link', { name: /Download \.pbix/ })).toHaveAttribute('href', '/published/hr-report-0002/Workforce.pbix');
+  await page.getByRole('button', { name: 'Download Workforce.pbix' }).click();
+  await expect(page.getByRole('dialog', { name: 'Request this file' })).toContainText('meisam.gholizadeh@hotmail.com');
 
   // Without a link there is nothing to open: an honest message instead of an empty frame.
   await page.goto('/gallery/files/ring-gauge-0001');

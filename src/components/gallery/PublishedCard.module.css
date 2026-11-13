@@ -136,7 +136,14 @@
   box-shadow: var(--focus-ring);
 }
 
+.download,
+.secondary {
+  font-family: inherit;
+  cursor: pointer;
+}
+
 .download {
+  border: 0;
   display: inline-flex;
   align-items: center;
   gap: 6px;

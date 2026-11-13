@@ -1,9 +1,10 @@
 import { Link } from 'react-router';
-import { BarChart3, Download, Eye, Lock, Puzzle } from 'lucide-react';
+import { BarChart3, Eye, Lock, Puzzle } from 'lucide-react';
 import type { PublishedItem } from '@/domain/schemas/published';
 import { templateRepository } from '@/services/templateService';
 import { formatBytes } from '@/services/published/manifest';
 import { CategoryIcon } from './CategoryIcon';
+import { FileRequestButton } from './FileRequestButton';
 import styles from './PublishedCard.module.css';
 
 const KIND_LABEL = { pbix: 'Power BI report', pbiviz: 'Custom visual' } as const;
@@ -55,16 +56,7 @@ export function PublishedCard({ item }: { item: PublishedItem }) {
             </Link>
           )}
           {item.downloadable ? (
-            <a
-              className={item.embedUrl ? styles.secondary : styles.download}
-              href={`/${item.file.path}`}
-              download={item.file.name}
-              aria-label={`Download ${item.file.name}`}
-              title={`Download ${item.file.name}`}
-            >
-              <Download size={15} aria-hidden="true" />
-              {item.embedUrl ? 'Download' : `Download ${item.file.name}`}
-            </a>
+            <FileRequestButton item={item} className={item.embedUrl ? styles.secondary : styles.download} label={item.embedUrl ? 'Download' : `Download ${item.file.name}`} />
           ) : (
             <p className={styles.noDownload}>
               <Lock size={14} aria-hidden="true" />

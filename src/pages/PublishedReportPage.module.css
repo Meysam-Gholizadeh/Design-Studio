@@ -59,6 +59,9 @@
 }
 
 .primaryLink {
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
   background: var(--app-accent);
   color: var(--app-on-accent);
 }

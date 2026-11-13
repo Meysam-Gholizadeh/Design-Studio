@@ -668,6 +668,11 @@ Details are in `docs/PUBLISHING.md`.
   - **Gallery:** the card gets **Open report**. The new page `/gallery/files/:itemId` frames the report and offers Open in Power BI and Download. Reports without a link get an explanatory message.
   - **Tests:** 4 more unit tests (link parsing, accepted and refused hosts and paths, publishing with a link, the set/clear commit). E2E now covers adding the link on `/admin`, including refusing a wrong link, and opening the report page with Power BI stubbed.
   - **Not yet verified:** a real "Publish to web" report shown on the live site.
+- **Download buttons show contact details** (2026-11-13, user request):
+  - **Change:** the card's Download and the report page's Download .pbix buttons open a dialog with the owner's email (`src/data/siteOwner.ts`, a mailto link naming the file) instead of downloading (`FileRequestButton.tsx`).
+  - **Tests:** the E2E test checks the dialog text, the mailto link, that it closes, and that no download starts.
+  - **Limitation:** files with downloads on remain fetchable by their address.
+- **Custom-visual export in "Publish to web"** (2026-11-13, investigated at the user's request): the report's "Export XLSX" custom visual fails in the portal. It fails the same way on the public link opened directly on app.powerbi.com: `downloadService.exportVisualsContent` returns `false`. Microsoft documents that API as supported only in the Power BI service and Desktop. The portal sends no CSP or Permissions-Policy, and its iframe has no `sandbox`, so the portal does not block it.
 
 ## Fitness Overview (2026-11-06, user request with a reference screenshot)
 - **Request:** build the reference's fitness dashboard keeping all details, and find similar images on the web.
